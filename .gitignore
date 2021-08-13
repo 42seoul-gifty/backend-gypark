@@ -2,3 +2,6 @@ venv/
 **/migrations
 **/__pycache__
 **/*.sqlite3
+**/staticfiles
+db
+.secrets

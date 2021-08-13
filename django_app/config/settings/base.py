@@ -11,21 +11,24 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
+import json
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+ROOT_DIR = BASE_DIR.parent
 
-
+SECRET_DIR = ROOT_DIR / '.secrets'
+SECRET_COMMON_FILE = SECRET_DIR / 'common.json'
+SECRET_DEBUG_FILE = SECRET_DIR / 'debug.json'
+SECRET_DEPLOY_FILE = SECRET_DIR / 'deploy.json'
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-=0pzu_cy*jx%xlci7kxpwt*c*us+fm@8c+toxn!j9e^w8k&_y^'
+COMMON_SECRET = json.loads(SECRET_COMMON_FILE.read_text())
+SECRET_KEY = COMMON_SECRET['secret_key']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -67,18 +70,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'config.wsgi.application'
-
-
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
 
 
 # Password validation

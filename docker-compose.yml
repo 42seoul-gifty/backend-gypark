@@ -1,0 +1,38 @@
+version: "2"
+services:
+    nginx:
+        image: nginx:latest
+        container_name: nginx
+        ports:
+            - "80:80"
+        environment:
+            NGINX_ENVSUBST_TEMPLATE_SUFFIX: ".conf"
+            SERVER_NAME: ${NGINX_SERVER_NAME}
+        volumes:
+            - ./nginx:/etc/nginx/conf.d/
+            - ./django_app/staticfiles:/staticfiles
+        depends_on:
+            - web
+
+    web:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: web
+        command: bash -c "cd django_app && ./entrypoint.sh"
+        volumes:
+            - ./django_app:/django_app
+        depends_on:
+            - db
+
+    db:
+        image: mariadb:latest
+        container_name: mysql
+        environment:
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+        volumes:
+            - ./db/data:/var/lib/mysql
+
