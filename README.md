@@ -2,7 +2,7 @@
 
 ## Visualized
 
-![visualized](/Users/gypark/work/backend-gypark-1/django_app/db-visualized.png)
+![db-visualized](./django_app/db-visualized.png)
 
 ## ORM
 
