@@ -14,7 +14,7 @@ class Receiver(BaseModel):
 
 class Order(BaseModel):
     giver = models.ForeignKey(User, on_delete=models.CASCADE)
-    receiver = models.ForeignKey(Receiver, on_delete=models.DO_NOTHING)
+    receiver = models.OneToOneField(Receiver, on_delete=models.DO_NOTHING)
     product = models.ForeignKey(Product, on_delete=models.DO_NOTHING, related_name='order')
     gender = models.ManyToManyField(GenderCategory, related_name="orders")
     age = models.ManyToManyField(AgeCategory, related_name='orders')
@@ -26,3 +26,18 @@ class Order(BaseModel):
         ('배송중', '배송중'),
         ('배송완료', '배송완료')
     ])
+
+
+class Payment(models.Model):
+    order = models.OneToOneField(Order, on_delete=models.DO_NOTHING)
+    imp_uid = models.CharField(max_length=128, blank=True)
+    amount = models.PositiveIntegerField(default=0)
+    created = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=64, choices=[
+        ('결제실패', '결제실패'),
+        ('결제완료', '결제완료')
+    ])
+
+    @property
+    def merchant_uid(self):
+        return str(self.order.pk)
