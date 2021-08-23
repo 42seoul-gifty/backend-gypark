@@ -1,0 +1,43 @@
+<html>
+<head>
+    <script src="https://developers.kakao.com/sdk/js/kakao.min.js"> </script>
+    <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+</head>
+<body>
+    <a id="custom-login-btn" href="javascript:loginWithKakao()">
+    <img
+        src="//k.kakaocdn.net/14/dn/btqCn0WEmI3/nijroPfbpCa4at5EIsjyf0/o.jpg"
+        width="222"
+    />
+    </a>
+    <script type="text/javascript">
+    function login_myserver(access_token) {
+        $.ajax({
+            url: "/login/kakao",
+            type: "POST",
+            data: {access_token: access_token},
+            success: function(res) {
+                alert(JSON.stringify(res));
+            },
+            error: function(res) {
+                alert(JSON.stringify(res));
+            },
+            fail: function(res) {
+                alert(JSON.stringify(res));
+            }
+        })
+    }
+    function loginWithKakao() {
+        Kakao.init("2f89bf1f614893436b8174d4d3d7a30c")
+        Kakao.Auth.login({
+        success: function(authObj) {
+            login_myserver(authObj.access_token);
+        },
+        fail: function(err) {
+            alert(JSON.stringify(err));
+        },
+        })
+    }
+    </script>
+</body>
+</html>
