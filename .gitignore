@@ -6,3 +6,4 @@ venv/
 db
 .secrets
 utils
+.vscode
