@@ -10,14 +10,15 @@ from rest_framework.response import Response
 from .serializers import (
     KakaoLoginSerializer,
     LogoutSerializer,
+    NaverLoginSerializer,
     UserSerializer
 )
 from .models import User
 from .permissions import OwnerPermission
 
 
-class KakaoLoginView(GenericAPIView):
-    serializer_class = KakaoLoginSerializer
+class SocialLoginView(GenericAPIView):
+    serializer_class = None
 
     def post(self, request):
         email = request.data.get('email')
@@ -31,9 +32,17 @@ class KakaoLoginView(GenericAPIView):
         if not serializer.is_valid():
             return Response({'errors': serializer.errors})
 
-        user = serializer.save(login_type='kakao')
+        user = serializer.save()
         update_last_login(None, user)
         return Response(UserSerializer(user).data)
+
+
+class KakaoLoginView(SocialLoginView):
+    serializer_class = KakaoLoginSerializer
+
+
+class NaverLoginView(SocialLoginView):
+    serializer_class = NaverLoginSerializer
 
 
 class LogoutView(GenericAPIView):
