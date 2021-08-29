@@ -15,7 +15,7 @@ class User(AbstractUser):
     token = models.CharField(
         '토큰',
         blank=True,
-        max_length=128
+        max_length=256
     )
     login_type = models.CharField(
         '로그인 타입',
