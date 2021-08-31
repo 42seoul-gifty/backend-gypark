@@ -12,21 +12,6 @@ class User(AbstractUser):
         '닉네임',
         max_length=32
     )
-    token = models.CharField(
-        '토큰',
-        blank=True,
-        max_length=256
-    )
-    login_type = models.CharField(
-        '로그인 타입',
-        blank=True,
-        max_length=32,
-        choices=[
-            ('kakao', 'kakao'),
-            ('naver', 'naver'),
-            ('gifty', 'gifty'),
-        ]
-    )
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []

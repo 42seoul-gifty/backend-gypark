@@ -1,70 +1,39 @@
-from django.contrib.auth.models import update_last_login
-
-from rest_framework.generics import (
-    GenericAPIView,
-    RetrieveAPIView
-)
+from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.status import HTTP_400_BAD_REQUEST
 
-from .serializers import (
-    KakaoLoginSerializer,
-    LogoutSerializer,
-    NaverLoginSerializer,
-    UserSerializer
-)
-from .models import User
+from dj_rest_auth.registration.views import SocialLoginView
+
+from allauth.socialaccount.providers.kakao.views import KakaoOAuth2Adapter
+from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+
 from .permissions import OwnerPermission
+from .serializers import UserSerializer
+from .models import User
 
 
-class SocialLoginView(GenericAPIView):
-    serializer_class = None
+class CustomSocialLoginView(SocialLoginView):
+    def get(self, request, *args, **kwargs):
+        self.request = request
+        # data = {'code': self.request.headers.get('Authorization-Code')}
+        data = {'code': self.request.GET.get('code')}
+        self.serializer = self.get_serializer(data=data)
 
-    def post(self, request):
-        email = request.data.get('email')
+        if not self.serializer.is_valid():
+            return Response(self.serializer.errors, status=HTTP_400_BAD_REQUEST)
 
-        try:
-            user = User.objects.get(email=email)
-            serializer = self.serializer_class(instance=user, data=request.data)
-        except User.DoesNotExist:
-            serializer = self.serializer_class(data=request.data)
-
-        if not serializer.is_valid():
-            return Response({'errors': serializer.errors})
-
-        user = serializer.save()
-        update_last_login(None, user)
-        return Response(UserSerializer(user).data)
+        self.login()
+        return self.get_response()
 
 
-class KakaoLoginView(SocialLoginView):
-    serializer_class = KakaoLoginSerializer
-
-
-class NaverLoginView(SocialLoginView):
-    serializer_class = NaverLoginSerializer
-
-
-class LogoutView(GenericAPIView):
-    serializer_class = LogoutSerializer
-
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data)
-
-        if not serializer.is_valid():
-            return Response({'errors': serializer.errors})
-
-        user = User.objects.get(
-            token=serializer.validated_data['token']
-        )
-        user.token = ''
-        user.save()
-
-        return Response()
+class KakaoLoginView(CustomSocialLoginView):
+    adapter_class = KakaoOAuth2Adapter
+    callback_url = 'http://localhost:8000/login/kakao'
+    client_class = OAuth2Client
 
 
 class UserDetailView(RetrieveAPIView):
     permission_classes = (IsAuthenticated, OwnerPermission)
     serializer_class = UserSerializer
     queryset = User.objects.all()
-

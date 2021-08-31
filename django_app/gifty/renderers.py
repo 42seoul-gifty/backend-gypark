@@ -4,23 +4,16 @@ from rest_framework.exceptions import ErrorDetail
 
 class DefaultJSONRenderer(JSONRenderer):
     def is_available_value(self, data):
-        return isinstance(data, bool) or bool(data) == True
+        return isinstance(data, list) or isinstance(data, bool) or bool(data)
 
     def render_success(self, data, renderer_context):
-        return renderer_context['response'].status_code == 200 and \
-               (isinstance(data, list) or 'errors' not in data.keys())
+        return renderer_context['response'].status_code == 200
 
-    def render_message(self, data):
-        if isinstance(data, list):
+    def render_message(self, data, success):
+        if success:
             return None
 
-        message = data.pop('errors', None)
-        message = data.pop('message', message)
-
-        if data.get('detail') and isinstance(data['detail'], ErrorDetail):
-            message = data.pop('detail', message)
-
-        return self.flat_message(message)
+        return self.flat_message(data)
 
     def flat_message(self, message):
         if not message:
@@ -33,26 +26,23 @@ class DefaultJSONRenderer(JSONRenderer):
             return '\n'.join([f'{key}: {self.flat_message(val)}' for key, val in message.items()])
 
         if isinstance(message, list):
-            return ', '.join(message)
+            return ', '.join(map(lambda item: self.flat_message(item), message))
 
         return str(message)
 
     def wrap_data(self, data, renderer_context):
-        data = data or {}
-
         renderer_context = renderer_context or {}
         success = self.render_success(data, renderer_context)
-        message = self.render_message(data)
+        message = self.render_message(data, success)
+        data = data if success else None
 
-        data = {
+        wrapped = {
             'success': success,
             'message': message,
             'data': data,
         }
 
-        rm_blank = {key:val for key,val in data.items() if self.is_available_value(val)}
-
-        return rm_blank
+        return {key:val for key,val in wrapped.items() if self.is_available_value(val)}
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
         data = self.wrap_data(data, renderer_context)
