@@ -1,4 +1,5 @@
 from rest_framework.renderers import JSONRenderer
+from rest_framework.exceptions import ErrorDetail
 
 
 class DefaultJSONRenderer(JSONRenderer):
@@ -7,12 +8,18 @@ class DefaultJSONRenderer(JSONRenderer):
 
     def render_success(self, data, renderer_context):
         return renderer_context['response'].status_code == 200 and \
-               'errors' not in data.keys()
+               (isinstance(data, list) or 'errors' not in data.keys())
 
     def render_message(self, data):
+        if isinstance(data, list):
+            return None
+
         message = data.pop('errors', None)
         message = data.pop('message', message)
-        message = data.pop('detail', message)
+
+        if data.get('detail') and isinstance(data['detail'], ErrorDetail):
+            message = data.pop('detail', message)
+
         return self.flat_message(message)
 
     def flat_message(self, message):
