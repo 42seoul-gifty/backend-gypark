@@ -5,7 +5,8 @@ from .views import (
     OrderDetailDeleteView,
     PaymentValidationView,
     ReceiverDetailUpdateView,
-    ReceiverDataSetView
+    ReceiverDataSetView,
+    ReceiverLikeProductsView
 )
 
 
@@ -19,4 +20,5 @@ urlpatterns = [
 
     path('receiver/<str:uuid>', ReceiverDetailUpdateView.as_view(), name='receiver_detail'),
     path('receiver/<str:uuid>/choice', ReceiverDataSetView.as_view(), name='choice_dataset'),
+    path('receiver/<str:uuid>/like', ReceiverLikeProductsView.as_view(), name='receiver_likes'),
 ]

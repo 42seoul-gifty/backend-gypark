@@ -2,6 +2,7 @@ import string
 import random
 
 from django.db import models
+from django.shortcuts import get_object_or_404
 
 from gifty.models import (
     BaseModel,
@@ -110,6 +111,11 @@ class Receiver(BaseModel):
             'age__in': order.age.all()
         }
         return Product.objects.filter(**filter_kwargs)
+
+    @staticmethod
+    def get_available_or_404(uuid):
+        queryset = Receiver.objects.exclude(shipment_status='배송완료')
+        return get_object_or_404(queryset, uuid=uuid)
 
 
 

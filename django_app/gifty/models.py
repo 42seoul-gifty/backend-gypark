@@ -139,14 +139,14 @@ class Product(BaseModel):
         '노출수',
         default=0
     )
-    # likes = models.ManyToManyField(
-    #     'Receiver',
-    #     related_name='likes'
-    # )
-    # dislikes = models.ManyToManyField(
-    #     'Receiver',
-    #     related_name='dislikes',
-    # )
+    likes = models.ManyToManyField(
+        'order.Receiver',
+        related_name='likes'
+    )
+    dislikes = models.ManyToManyField(
+        'order.Receiver',
+        related_name='dislikes',
+    )
     gender = models.ManyToManyField(
         GenderCategory,
         related_name='products'

@@ -1,6 +1,8 @@
 from rest_framework.serializers import (
     ModelSerializer,
-    SerializerMethodField
+    Serializer,
+    SerializerMethodField,
+    CharField
 )
 
 from django.db.models import (
@@ -14,6 +16,7 @@ from .models import (
     PriceCategory,
     GenderCategory,
 )
+from order.models import Receiver
 
 
 class ProductSerializer(ModelSerializer):
@@ -90,3 +93,8 @@ class PriceSerializer(ModelSerializer):
             'id',
             'value',
         )
+
+
+class ProductReactSerializer(Serializer):
+    receiver_id = CharField()
+
