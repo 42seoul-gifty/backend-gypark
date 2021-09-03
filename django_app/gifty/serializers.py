@@ -8,7 +8,12 @@ from django.db.models import (
     Min
 )
 
-from .models import Product
+from .models import (
+    Product,
+    AgeCategory,
+    PriceCategory,
+    GenderCategory,
+)
 
 
 class ProductSerializer(ModelSerializer):
@@ -52,4 +57,36 @@ class ProductSerializer(ModelSerializer):
         return map(
             lambda url: request.build_absolute_uri(url),
             urls
+        )
+
+
+class AgeSerializer(ModelSerializer):
+    value = SerializerMethodField()
+
+    class Meta:
+        model = AgeCategory
+        fields = (
+            'id',
+            'value',
+        )
+
+    def get_value(self, obj):
+        return str(obj)
+
+
+class GenderSerializer(ModelSerializer):
+    class Meta:
+        model = GenderCategory
+        fields = (
+            'id',
+            'name'
+        )
+
+
+class PriceSerializer(ModelSerializer):
+    class Meta:
+        model = PriceCategory
+        fields = (
+            'id',
+            'value',
         )
