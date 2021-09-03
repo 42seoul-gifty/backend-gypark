@@ -6,15 +6,15 @@ from django.conf import settings
 from rest_framework.serializers import (
     ModelSerializer,
     CharField,
+    Serializer,
     SerializerMethodField,
     DateTimeField,
     PrimaryKeyRelatedField
 )
-from rest_framework.exceptions import (
-    ValidationError,
-    PermissionDenied
-)
+from rest_framework.exceptions import ValidationError
 
+from gifty.models import Product
+from gifty.serializers import ProductSerializer
 from .models import (
     Order,
     Receiver,
@@ -32,6 +32,12 @@ class AddressSerializer(ModelSerializer):
             'detail'
         )
 
+    def create(self, validated_data):
+        return Address.objects.update_or_create(
+            defaults=validated_data,
+            receiver=validated_data['receiver'],
+        )[0]
+
 
 class ReceiverCreateSerializer(ModelSerializer):
     class Meta:
@@ -42,8 +48,46 @@ class ReceiverCreateSerializer(ModelSerializer):
         )
 
 
+class ReceiverPatchSerializer(ModelSerializer):
+    product_id = PrimaryKeyRelatedField(queryset=Product.objects.all())
+    address = CharField(write_only=True)
+    detail = CharField(write_only=True, allow_blank=True)
+    post_code = CharField(write_only=True)
+
+    class Meta:
+        model = Receiver
+        fields = (
+            'product_id',
+            'address',
+            'detail',
+            'post_code',
+        )
+
+    def validate(self, attrs):
+        if hasattr(self, 'address_serializer'):
+            return attrs
+
+        self.address_serializer = AddressSerializer(
+            data={
+                'address': attrs.pop('address'),
+                'detail': attrs.pop('detail'),
+                'post_code': attrs.pop('post_code'),
+            }
+        )
+        self.address_serializer.is_valid(raise_exception=True)
+
+        return attrs
+
+    def update(self, instance, validated_data):
+        instance.product = validated_data['product_id']
+        instance.save()
+        self.address_serializer.save(receiver=instance)
+        return instance
+
+
 class ReceiverSerializer(ModelSerializer):
     address = SerializerMethodField()
+    id = SerializerMethodField()
 
     class Meta:
         model = Receiver
@@ -60,6 +104,9 @@ class ReceiverSerializer(ModelSerializer):
             return AddressSerializer(obj.address).data
         except ObjectDoesNotExist:
             return AddressSerializer(None).data
+
+    def get_id(self, obj):
+        return obj.uuid
 
 
 class OrderCreateSerializer(ModelSerializer):
@@ -158,11 +205,15 @@ class PaymentValidationSerializer(ModelSerializer):
         raise ValidationError('주문 정보가 일치하지 않습니다.')
 
     def create(self, validated_data):
+        order = validated_data['merchant_uid']
         payment = Payment.objects.update_or_create(
-            **validated_data,
-            amount=validated_data['merchant_uid'].price.value,
-            status='결제완료'
-        )
+            defaults={
+                **validated_data,
+                'amount': order.price.value,
+                'status': '결제완료'
+            },
+            merchant_uid=order
+        )[0]
         return payment
 
     def get_access_token(self):
@@ -189,3 +240,22 @@ class PaymentValidationSerializer(ModelSerializer):
             raise ValidationError(res.json()['message'])
 
         return res.json()['response']
+
+
+class ReceiverDataSetSerializer(Serializer):
+    giver_name = SerializerMethodField()
+    giver_phone = SerializerMethodField()
+    products = SerializerMethodField()
+
+    def get_giver_name(self, receiver):
+        return receiver.order.giver_name
+
+    def get_giver_phone(self, receiver):
+        return receiver.order.giver_phone
+
+    def get_products(self, receiver):
+        return ProductSerializer(
+            receiver.products_list,
+            context=self.context,
+            many=True).data
+

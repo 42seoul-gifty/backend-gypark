@@ -1,7 +1,10 @@
+from django.shortcuts import get_object_or_404
+
 from rest_framework.generics import (
     ListCreateAPIView,
     RetrieveDestroyAPIView,
-    GenericAPIView
+    GenericAPIView,
+    RetrieveAPIView
 )
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -10,11 +13,17 @@ from rest_framework.status import (
     HTTP_201_CREATED
 )
 
-from .models import Order
+from .models import (
+    Order,
+    Receiver
+)
 from .serializers import (
     OrderCreateSerializer,
     OrderSerializer,
-    PaymentValidationSerializer
+    PaymentValidationSerializer,
+    ReceiverSerializer,
+    ReceiverPatchSerializer,
+    ReceiverDataSetSerializer
 )
 from user.permissions import (
     OwnerUrlPermission,
@@ -55,3 +64,34 @@ class PaymentValidationView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(status=HTTP_200_OK)
+
+
+class ReceiverDetailUpdateView(RetrieveAPIView):
+    permission_classes = tuple()
+
+    def get_serializer_class(self):
+        if self.request.method == 'PATCH':
+            return ReceiverPatchSerializer
+        return ReceiverSerializer
+
+    def patch(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=HTTP_200_OK)
+
+    def get_object(self):
+        queryset = Receiver.objects.exclude(shipment_status='배송완료')
+        obj = get_object_or_404(queryset, uuid=self.kwargs['uuid'])
+        return obj
+
+
+class ReceiverDataSetView(RetrieveAPIView):
+    permission_classes = tuple()
+    serializer_class = ReceiverDataSetSerializer
+
+    def get_object(self):
+        queryset = Receiver.objects.exclude(shipment_status='배송완료')
+        obj = get_object_or_404(queryset, uuid=self.kwargs['uuid'])
+        return obj

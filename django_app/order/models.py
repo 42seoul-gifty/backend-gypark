@@ -1,4 +1,6 @@
-from django.core import validators
+import string
+import random
+
 from django.db import models
 
 from gifty.models import (
@@ -71,6 +73,44 @@ class Receiver(BaseModel):
         ],
         default='미선택'
     )
+    uuid = models.CharField(
+        max_length=6
+    )
+
+    @property
+    def user(self):
+        return self.order.user
+
+    @property
+    def link(self):
+        return f'front-host/receiver/{self.uuid}'
+
+    def set_uuid(self):
+        # https://stackoverflow.com/questions/13484726/safe-enough-8-character-short-unique-random-string
+        if self.uuid:
+            return
+
+        alphabet = string.ascii_lowercase + string.digits
+        uuid = ''.join(random.choices(alphabet, k=6))
+        receiver = Receiver.objects.filter(uuid=uuid).exclude(
+            shipment_status='배송완료'
+        )
+
+        if receiver.exists():
+            self.set_uuid()
+
+        self.uuid = uuid
+
+    @property
+    def products_list(self):
+        order = self.order
+        filter_kwargs = {
+            'price': order.price,
+            'gender__in': order.gender.all(),
+            'age__in': order.age.all()
+        }
+        return Product.objects.filter(**filter_kwargs)
+
 
 
 class Address(BaseModel):
