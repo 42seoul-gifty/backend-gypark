@@ -7,7 +7,7 @@ class DefaultJSONRenderer(JSONRenderer):
         return isinstance(data, list) or isinstance(data, bool) or bool(data)
 
     def render_success(self, data, renderer_context):
-        return renderer_context['response'].status_code == 200
+        return renderer_context['response'].status_code // 100 == 2
 
     def render_message(self, data, success):
         if success:

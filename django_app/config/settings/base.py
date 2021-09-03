@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'django_filters',
     'gifty',
     'user',
+    'order',
 ]
 
 MIDDLEWARE = [
@@ -168,3 +169,6 @@ MEDIA_ROOT = BASE_DIR / 'media'
 REST_AUTH_SERIALIZERS = {
     'USER_DETAILS_SERIALIZER': 'user.serializers.UserSerializer'
 }
+
+IMP_KEY = COMMON_SECRET['imp_key']
+IMP_SECRET = COMMON_SECRET['imp_secret']

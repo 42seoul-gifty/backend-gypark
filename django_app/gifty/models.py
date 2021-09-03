@@ -35,6 +35,9 @@ class GenderCategory(BaseModel):
         related_name='genders'
     )
 
+    def __str__(self):
+        return self.name
+
 
 class AgeCategory(BaseModel):
     name = models.CharField(
@@ -63,6 +66,9 @@ class AgeCategory(BaseModel):
         related_name='ages'
     )
 
+    def __str__(self):
+        return self.name or f'{self.min}~{self.max}'
+
 
 class PriceCategory(BaseModel):
     value = models.PositiveIntegerField(
@@ -84,12 +90,18 @@ class PriceCategory(BaseModel):
         related_name='prices'
     )
 
+    def __str__(self):
+        return str(self.value)
+
 
 class ProductCategory(BaseModel):
     name = models.CharField(
         '이름',
         max_length=32
     )
+
+    def __str__(self):
+        return self.name
 
 
 class Product(BaseModel):
