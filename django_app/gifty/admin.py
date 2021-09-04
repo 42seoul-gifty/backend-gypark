@@ -6,8 +6,13 @@ from .models import (
     GenderCategory,
     PriceCategory,
     Product,
-    AgeCategory
+    AgeCategory,
+    ProductImage
 )
+
+
+class BaseModelAdmin(admin.ModelAdmin):
+    list_per_page = 15
 
 
 class CategoryInline(admin.TabularInline):
@@ -36,8 +41,11 @@ class GenderCategoryInline(CategoryInline):
     verbose_name = "성별"
     verbose_name_plural = "성별"
 
+    def has_add_permission(self, request, obj=None):
+        return False
 
-class AppManagerAdmin(admin.ModelAdmin):
+
+class AppManagerAdmin(BaseModelAdmin):
     model = AppManager
     inlines = (AgeCategoryInline, PriceCategoryInline, GenderCategoryInline)
 
@@ -48,7 +56,53 @@ class AppManagerAdmin(admin.ModelAdmin):
         return False
 
 
+class ProductImageInline(admin.TabularInline):
+    model = ProductImage
+    fields = ('image', )
+    extra = 0
+    verbose_name = "상품 이미지"
+    verbose_name_plural = "상품 이미지 리스트"
+
+
+class ProductAdmin(BaseModelAdmin):
+    model = Product
+    list_display = (
+        'id',
+        'name',
+        'category',
+        'thumbnail_embed',
+        'description',
+        'vendor',
+        'views',
+        'like_count',
+    )
+    list_filter = (
+        'gender',
+        'age',
+        'price',
+        'category',
+    )
+    fields = (
+        'name',
+        'category',
+        'price',
+        'gender',
+        'age',
+        'consumer_price',
+        'margin_rate',
+        'link',
+        'description',
+        'detail',
+        'vendor',
+        'thumbnail',
+    )
+    inlines = (ProductImageInline, )
+
+
 class GiftyAdminSite(admin.AdminSite):
+    site_title = 'Gifty Admin'
+    site_header = 'Gifty Admin'
+    index_title = '목록'
     app_orders = [
         {
             'name': 'gifty',
@@ -62,8 +116,11 @@ class GiftyAdminSite(admin.AdminSite):
 
     def get_app_list(self, request):
         app_dict = self._build_app_dict(request)
-        app_list = []
 
+        if not app_dict:
+            return []
+
+        app_list = []
         for app in self.app_orders:
             app_list.append(app_dict[app['name']])
             models = app_list[-1]['models']
@@ -89,4 +146,4 @@ sites.site = gifty_admin_site
 
 
 admin.site.register(AppManager, AppManagerAdmin)
-admin.site.register(Product)
+admin.site.register(Product, ProductAdmin)
