@@ -16,7 +16,12 @@ class BaseModel(models.Model):
 
 
 class AppManager(BaseModel):
-    pass
+    class Meta:
+        verbose_name = '앱관리'
+        verbose_name_plural = '앱관리'
+
+    def __str__(self):
+        return '앱관리'
 
 
 class GenderCategory(BaseModel):
@@ -160,6 +165,10 @@ class Product(BaseModel):
         related_name='products',
         on_delete=models.CASCADE
     )
+
+    class Meta:
+        verbose_name = '상품'
+        verbose_name_plural = '상품관리'
 
 
 class ProductImage(BaseModel):
