@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.html import mark_safe
 
 
 class BaseModel(models.Model):
@@ -154,21 +155,48 @@ class Product(BaseModel):
     )
     gender = models.ManyToManyField(
         GenderCategory,
+        verbose_name='성별',
         related_name='products'
     )
     age = models.ManyToManyField(
         AgeCategory,
+        verbose_name='나이대',
         related_name='products'
     )
     price = models.ForeignKey(
         PriceCategory,
+        verbose_name='가격대',
         related_name='products',
         on_delete=models.CASCADE
+    )
+
+    link = models.URLField(
+        '링크',
+        blank=True
+    )
+    consumer_price = models.PositiveIntegerField(
+        '소비자가',
+    )
+    margin_rate = models.FloatField(
+        '마진율'
     )
 
     class Meta:
         verbose_name = '상품'
         verbose_name_plural = '상품관리'
+
+    def __str__(self):
+        return self.name
+
+    @property
+    def like_count(self):
+        return self.likes.count()
+    like_count.fget.short_description = '좋아요수'
+
+    @property
+    def thumbnail_embed(self):
+        return mark_safe('<img src="%s" width="80" height="80" />' % (self.thumbnail.url))
+    thumbnail_embed.fget.short_description = '썸네일'
 
 
 class ProductImage(BaseModel):
@@ -178,6 +206,9 @@ class ProductImage(BaseModel):
         on_delete=models.CASCADE
     )
     image = models.ImageField(
-        '상품 상세 이미지',
+        '상품 이미지',
         upload_to='product/images/%Y/%m/%d'
     )
+
+    def __str__(self):
+        return ''
