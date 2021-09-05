@@ -44,6 +44,14 @@ class Order(BaseModel):
          on_delete=models.DO_NOTHING
     )
 
+    class Meta:
+        verbose_name = '배송'
+        verbose_name_plural = '배송관리'
+
+    @property
+    def receiver(self):
+        return self.receivers.first()
+
 
 class Receiver(BaseModel):
     order = models.ForeignKey(

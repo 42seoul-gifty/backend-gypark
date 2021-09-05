@@ -109,6 +109,10 @@ class GiftyAdminSite(admin.AdminSite):
             'model_orders': ['앱관리', '상품관리']
         },
         {
+            'name': 'order',
+            'model_orders': ['배송관리']
+        },
+        {
             'name': 'user',
             'model_orders': ['사용자(들)']
         }
