@@ -114,7 +114,7 @@ class GiftyAdminSite(admin.AdminSite):
         },
         {
             'name': 'user',
-            'model_orders': ['사용자(들)']
+            'model_orders': ['회원관리']
         }
     ]
 
