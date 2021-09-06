@@ -1,18 +1,20 @@
 from django_filters import (
     FilterSet,
-    NumberFilter,
     ModelMultipleChoiceFilter,
+    ModelChoiceFilter
 )
 
 from .models import (
     AgeCategory,
-    GenderCategory
+    GenderCategory,
+    PriceCategory
 )
 
 
 class ProductFilter(FilterSet):
-    price = NumberFilter(
-        field_name='price__value'
+    price = ModelChoiceFilter(
+        field_name='price',
+        queryset=PriceCategory.objects.all()
     )
     age = ModelMultipleChoiceFilter(
         field_name='age',
