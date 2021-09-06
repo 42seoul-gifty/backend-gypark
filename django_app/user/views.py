@@ -16,8 +16,7 @@ from .models import User
 class CustomSocialLoginView(SocialLoginView):
     def get(self, request, *args, **kwargs):
         self.request = request
-        # data = {'code': self.request.headers.get('Authorization-Code')}
-        data = {'code': self.request.GET.get('code')}
+        data = {'code': self.request.headers.get('Authorization-Code')}
         self.serializer = self.get_serializer(data=data)
 
         if not self.serializer.is_valid():
