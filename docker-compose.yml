@@ -24,7 +24,8 @@ services:
         volumes:
             - ./django_app:/django_app
         depends_on:
-            - db
+            db:
+                condition: service_healthy
 
     db:
         image: mariadb:latest
@@ -36,4 +37,8 @@ services:
             MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
         volumes:
             - ./db/data:/var/lib/mysql
+        healthcheck:
+            test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+            timeout: 20s
+            retries: 10
 
