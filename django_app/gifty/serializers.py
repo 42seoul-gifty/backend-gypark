@@ -54,12 +54,11 @@ class ProductSerializer(ModelSerializer):
         return obj.price.value
 
     def get_image_url(self, obj):
-        urls = obj.images.values_list('image', flat=True)
         request = self.context.get('request', None)
 
         return map(
-            lambda url: request.build_absolute_uri(url),
-            urls
+            lambda obj: request.build_absolute_uri(obj.image.url),
+            obj.images.all()
         )
 
 
