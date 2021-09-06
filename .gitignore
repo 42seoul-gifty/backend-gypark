@@ -5,3 +5,6 @@ venv/
 **/staticfiles
 db
 .secrets
+.vscode
+utils
+**/media
