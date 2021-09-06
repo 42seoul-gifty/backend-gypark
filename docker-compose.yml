@@ -11,6 +11,7 @@ services:
         volumes:
             - ./nginx:/etc/nginx/conf.d/
             - ./django_app/staticfiles:/staticfiles
+            - ./django_app/media:/media
         depends_on:
             - web
 
