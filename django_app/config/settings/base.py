@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'django.contrib.sites',
     'django_filters',
+    'drf_yasg',
     'gifty',
     'user',
     'order',
