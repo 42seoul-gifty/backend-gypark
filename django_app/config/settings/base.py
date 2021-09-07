@@ -143,7 +143,7 @@ SITE_ID = 1
 # from rest_framework_simplejwt.authentication import JWTAuthentication
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
     ),
     'DEFAULT_RENDERER_CLASSES': [
         'gifty.renderers.DefaultJSONRenderer',
@@ -173,3 +173,6 @@ REST_AUTH_SERIALIZERS = {
 
 IMP_KEY = COMMON_SECRET['imp_key']
 IMP_SECRET = COMMON_SECRET['imp_secret']
+
+JWT_AUTH_COOKIE = 'access'
+JWT_AUTH_REFRESH_COOKIE = 'refresh'
