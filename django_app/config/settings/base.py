@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_extensions',
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
@@ -173,3 +174,7 @@ REST_AUTH_SERIALIZERS = {
 
 IMP_KEY = COMMON_SECRET['imp_key']
 IMP_SECRET = COMMON_SECRET['imp_secret']
+
+
+# ./manage.py graph_models --pydot -g -E -o my_apps.png gifty user order
+# ./manage.py graph_models --pydot -g -E -o all_apps.png -a
