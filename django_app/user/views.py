@@ -1,12 +1,19 @@
+from django.conf import settings
+
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import HTTP_400_BAD_REQUEST
 
 from dj_rest_auth.registration.views import SocialLoginView
+from dj_rest_auth.views import (
+    LoginView,
+    LogoutView
+)
 
 from allauth.socialaccount.providers.kakao.views import KakaoOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+
 
 from .permissions import OwnerPermission
 from .serializers import UserSerializer
@@ -28,8 +35,16 @@ class CustomSocialLoginView(SocialLoginView):
 
 class KakaoLoginView(CustomSocialLoginView):
     adapter_class = KakaoOAuth2Adapter
-    callback_url = 'http://localhost:8000/login/kakao'
+    callback_url = settings.KAKAO_CALLBACK_URI
     client_class = OAuth2Client
+
+
+class DefaultLoginView(LoginView):
+    authentication_classes = tuple()
+
+
+class DefaultLogoutView(LogoutView):
+    permission_classes = (IsAuthenticated, )
 
 
 class UserDetailView(RetrieveAPIView):

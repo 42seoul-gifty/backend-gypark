@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
-    'rest_framework_simplejwt.token_blacklist',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.kakao',
@@ -64,6 +63,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'user.middleware.CookieAutoRefreshToken',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -143,7 +143,7 @@ SITE_ID = 1
 # from rest_framework_simplejwt.authentication import JWTAuthentication
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+        'user.authentication.CookieAutoRefreshAuthentication',
     ),
     'DEFAULT_RENDERER_CLASSES': [
         'gifty.renderers.DefaultJSONRenderer',
@@ -157,7 +157,7 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=2),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
-    'ROTATE_REFRESH_TOKENS': False,
+    'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
 }
 
@@ -176,3 +176,5 @@ IMP_SECRET = COMMON_SECRET['imp_secret']
 
 JWT_AUTH_COOKIE = 'access'
 JWT_AUTH_REFRESH_COOKIE = 'refresh'
+
+KAKAO_CALLBACK_URI = COMMON_SECRET['kakao_callback_uri']
