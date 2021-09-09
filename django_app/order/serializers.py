@@ -9,7 +9,7 @@ from rest_framework.serializers import (
     Serializer,
     SerializerMethodField,
     DateTimeField,
-    PrimaryKeyRelatedField
+    PrimaryKeyRelatedField,
 )
 from rest_framework.exceptions import ValidationError
 
@@ -49,10 +49,20 @@ class ReceiverCreateSerializer(ModelSerializer):
 
 
 class ReceiverPatchSerializer(ModelSerializer):
-    product_id = PrimaryKeyRelatedField(queryset=Product.objects.all())
+    class ChoiceProductField(PrimaryKeyRelatedField):
+        def get_queryset(self):
+            try:
+                receiver = self.parent.instance
+            except AttributeError:
+                receiver = self.parent.parent.instance
+            return receiver.products_list
+
+    product_id = ChoiceProductField()
     address = CharField(write_only=True)
     detail = CharField(write_only=True, allow_blank=True)
     post_code = CharField(write_only=True)
+    likes = ChoiceProductField(many=True)
+    dislikes = ChoiceProductField(many=True)
 
     class Meta:
         model = Receiver
@@ -61,6 +71,8 @@ class ReceiverPatchSerializer(ModelSerializer):
             'address',
             'detail',
             'post_code',
+            'likes',
+            'dislikes',
         )
 
     def validate(self, attrs):
@@ -75,12 +87,13 @@ class ReceiverPatchSerializer(ModelSerializer):
             }
         )
         self.address_serializer.is_valid(raise_exception=True)
-
         return attrs
 
     def update(self, instance, validated_data):
         instance.product = validated_data['product_id']
         instance.save()
+        instance.likes.add(*validated_data['likes'])
+        instance.dislikes.add(*validated_data['dislikes'])
         self.address_serializer.save(receiver=instance)
         return instance
 

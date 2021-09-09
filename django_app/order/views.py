@@ -1,11 +1,10 @@
 from django.shortcuts import get_object_or_404
 
 from rest_framework.generics import (
-    ListAPIView,
     ListCreateAPIView,
     RetrieveDestroyAPIView,
     GenericAPIView,
-    RetrieveAPIView
+    RetrieveAPIView,
 )
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -26,7 +25,6 @@ from .serializers import (
     ReceiverPatchSerializer,
     ReceiverDataSetSerializer
 )
-from gifty.serializers import ProductSerializer
 from user.permissions import (
     OwnerUrlPermission,
     OwnerPermission,
@@ -97,12 +95,3 @@ class ReceiverDataSetView(RetrieveAPIView):
         queryset = Receiver.objects.exclude(shipment_status='배송완료')
         obj = get_object_or_404(queryset, uuid=self.kwargs['uuid'])
         return obj
-
-
-class ReceiverLikeProductsView(ListAPIView):
-    permission_classes = tuple()
-    serializer_class = ProductSerializer
-
-    def get_queryset(self):
-        receiver = Receiver.get_available_or_404(self.kwargs['uuid'])
-        return receiver.likes.all()
