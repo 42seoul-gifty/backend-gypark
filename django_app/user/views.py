@@ -6,6 +6,7 @@ from rest_framework.status import HTTP_400_BAD_REQUEST
 from dj_rest_auth.registration.views import SocialLoginView
 
 from allauth.socialaccount.providers.kakao.views import KakaoOAuth2Adapter
+from allauth.socialaccount.providers.naver.views import NaverOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 
 from .permissions import OwnerPermission
@@ -29,6 +30,12 @@ class CustomSocialLoginView(SocialLoginView):
 class KakaoLoginView(CustomSocialLoginView):
     adapter_class = KakaoOAuth2Adapter
     callback_url = 'http://localhost:8000/login/kakao'
+    client_class = OAuth2Client
+
+
+class NaverLoginView(CustomSocialLoginView):
+    adapter_class = NaverOAuth2Adapter
+    callback_url = 'http://localhost:8000/login/naver'
     client_class = OAuth2Client
 
 
