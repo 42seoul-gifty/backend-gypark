@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.kakao',
+    'allauth.socialaccount.providers.naver',
     'rest_framework.authtoken',
     'django.contrib.sites',
     'django_filters',
@@ -138,6 +139,8 @@ ACCOUNT_EMAIL_VERIFICATION = 'none'
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
+
+SOCIALACCOUNT_ADAPTER = 'user.account_adapters.GiftySocialAccountAapter'
 
 SITE_ID = 1
 # from rest_framework_simplejwt.authentication import JWTAuthentication
