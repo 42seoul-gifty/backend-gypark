@@ -3,6 +3,7 @@ from django.db.models import Count
 
 from .models import Order
 from .forms import OrderListChangeForm
+from gifty.admin import BaseModelAdmin
 
 
 class EditableCheckIgnore(admin.checks.ModelAdminChecks):
@@ -11,7 +12,7 @@ class EditableCheckIgnore(admin.checks.ModelAdminChecks):
         return []
 
 
-class OrderAdmin(admin.ModelAdmin):
+class OrderAdmin(BaseModelAdmin):
     model = Order
     list_display = (
         'id',
