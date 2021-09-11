@@ -14,13 +14,13 @@ from .models import (
 class ProductFilter(FilterSet):
     price = ModelChoiceFilter(
         field_name='price',
-        queryset=PriceCategory.objects.all()
+        queryset=PriceCategory.objects.actived()
     )
     age = ModelMultipleChoiceFilter(
         field_name='age',
-        queryset=AgeCategory.objects.all()
+        queryset=AgeCategory.objects.actived()
     )
     gender = ModelMultipleChoiceFilter(
         field_name='gender',
-        queryset=GenderCategory.objects.all()
+        queryset=GenderCategory.objects.actived()
     )
