@@ -1,6 +1,11 @@
 from django.db import models
 from django.utils.html import mark_safe
 
+from .managers import (
+    ActivedQuerysetManager,
+    ProductManager,
+)
+
 
 class BaseModel(models.Model):
     created = models.DateTimeField(
@@ -40,6 +45,7 @@ class GenderCategory(BaseModel):
         default=1,
         related_name='genders'
     )
+    objects = ActivedQuerysetManager()
 
     def __str__(self):
         return self.name
@@ -71,6 +77,7 @@ class AgeCategory(BaseModel):
         default=1,
         related_name='ages'
     )
+    objects = ActivedQuerysetManager()
 
     def __str__(self):
         return self.name or f'{self.min}~{self.max}'
@@ -95,6 +102,7 @@ class PriceCategory(BaseModel):
         default=1,
         related_name='prices'
     )
+    objects = ActivedQuerysetManager()
 
     def __str__(self):
         return str(self.value)
@@ -180,6 +188,7 @@ class Product(BaseModel):
     margin_rate = models.FloatField(
         '마진율'
     )
+    objects = ProductManager()
 
     class Meta:
         verbose_name = '상품'
