@@ -46,3 +46,6 @@ schema_view = get_schema_view(
 urlpatterns += [
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 ]
+
+handler404 = 'gifty.handlers.handler404'
+handler500 = 'gifty.handlers.handler500'

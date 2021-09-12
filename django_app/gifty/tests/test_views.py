@@ -205,3 +205,22 @@ class ProductListViewTest(TestCase):
         self.assertEqual(ids_list, list(range(7, 19)))
 
 
+class ErrorHandlerTest(TestCase):
+    def test_handler404(self):
+        response = self.client.get('/not-found')
+        self.assertEqual(response.status_code, 404)
+
+        data = response.json()
+        self.assertTrue('message' in data)
+        self.assertTrue('success' in data)
+        self.assertFalse(data['success'])
+
+    def test_handler500(self):
+        client = Client(raise_request_exception=False)
+        response = client.get('/test_500')
+        self.assertEqual(response.status_code, 500)
+
+        data = response.json()
+        self.assertTrue('message' in data)
+        self.assertTrue('success' in data)
+        self.assertFalse(data['success'])
