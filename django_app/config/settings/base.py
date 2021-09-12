@@ -176,3 +176,6 @@ REST_AUTH_SERIALIZERS = {
 
 IMP_KEY = COMMON_SECRET['imp_key']
 IMP_SECRET = COMMON_SECRET['imp_secret']
+
+KAKAO_CALLBACK_URI = COMMON_SECRET['kakao_callback_uri']
+NAVER_CALLBACK_URI = COMMON_SECRET['naver_callback_uri']

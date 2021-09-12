@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -29,13 +31,13 @@ class CustomSocialLoginView(SocialLoginView):
 
 class KakaoLoginView(CustomSocialLoginView):
     adapter_class = KakaoOAuth2Adapter
-    callback_url = 'http://localhost:8000/login/kakao'
+    callback_url = settings.KAKAO_CALLBACK_URI
     client_class = OAuth2Client
 
 
 class NaverLoginView(CustomSocialLoginView):
     adapter_class = NaverOAuth2Adapter
-    callback_url = 'http://localhost:8000/login/naver'
+    callback_url = settings.NAVER_CALLBACK_URI
     client_class = OAuth2Client
 
 
