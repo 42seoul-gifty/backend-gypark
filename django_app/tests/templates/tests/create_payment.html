@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- jQuery -->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js" ></script>
+    <!-- iamport.payment.js -->
+    <script type="text/javascript" src="https://cdn.iamport.kr/js/iamport.payment-1.1.8.js"></script>
+</head>
+<body>
+    <label for="amount">금액</label> <input id="amount"><br>
+    <label for="buyer_tel">구매자 번호</label> <input id="buyer_tel"><br>
+    <label for="merchant_uid">merchant_uid</label> <input id="merchant_uid"><br>
+    <label for="merchant_id_code">가맹점 식별 코드</label> <input id="merchant_id_code"><br>
+    <button onclick="requestPay()">결제하기</button>
+    <script>
+        function requestPay() {
+          var amount = Number(document.getElementById("amount").value);
+          var buyer_tel = document.getElementById("buyer_tel").value;
+          var merchant_uid = document.getElementById("merchant_uid").value;
+          var merchant_id_code = document.getElementById("merchant_id_code").value;
+          var IMP = window.IMP;
+          IMP.init(merchant_id_code);
+          IMP.request_pay({ // param
+              name: "test",
+              pay_method: "card",
+              merchant_uid: merchant_uid,
+              amount: amount,
+              buyer_tel: buyer_tel,
+          }, function (rsp) { // callback
+              if (rsp.success) {
+                  alert("결제 성공");
+              } else {
+                  alert("결제 실패");
+                  alert(JSON.stringify(rsp));
+              }
+          });
+        }
+      </script>
+</body>
+</html>

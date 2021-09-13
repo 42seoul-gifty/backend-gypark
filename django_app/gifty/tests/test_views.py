@@ -15,8 +15,9 @@ from .test_models import (
     get_dummy_price,
     get_dummy_product,
     get_dummy_product_category,
+    get_dummy_appmanager,
 )
-from ..models import AppManager, GenderCategory
+from ..models import GenderCategory
 from user.models import User
 
 
@@ -27,7 +28,7 @@ def all_subsets(ss, start=0):
 class ProductListViewTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        AppManager.objects.create()
+        get_dummy_appmanager()
         get_dummy_product_category()
         genders = [get_dummy_gender().id, get_dummy_gender().id]
         ages = [get_dummy_age().id, get_dummy_age().id]

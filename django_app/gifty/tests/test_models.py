@@ -85,11 +85,15 @@ def get_dummy_product_category(**kwargs):
     return product_category
 
 
+def get_dummy_appmanager():
+    return AppManager.objects.create()
+
+
 @override_settings(MEDIA_ROOT=MEDIA_ROOT)
 class TestProductActivedFilter(TestCase):
     @classmethod
     def setUpTestData(cls):
-        AppManager.objects.create()
+        get_dummy_appmanager()
         get_dummy_product_category()
         genders = [get_dummy_gender().id, get_dummy_gender().id]
         ages = [get_dummy_age().id, get_dummy_age().id]
