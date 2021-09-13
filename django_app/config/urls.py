@@ -31,6 +31,11 @@ urlpatterns = [
     path('', include('order.urls')),
 ]
 
+if settings.DEBUG:
+    urlpatterns.append(
+        path('tests/', include('tests.urls'))
+    )
+
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 schema_view = get_schema_view(

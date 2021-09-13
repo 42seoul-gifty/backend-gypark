@@ -56,12 +56,13 @@ class OrderDetailDeleteView(RetrieveDestroyAPIView):
 
 
 class PaymentValidationView(GenericAPIView):
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated, OwnerPermission)
     serializer_class = PaymentValidationSerializer
 
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        self.check_object_permissions(request, serializer.order)
         serializer.save()
         return Response(status=HTTP_200_OK)
 

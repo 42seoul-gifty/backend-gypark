@@ -210,9 +210,10 @@ class PaymentValidationSerializer(ModelSerializer):
         access_token = self.get_access_token()
         payment_data = self.get_payment_data(access_token, imp_uid)
 
-        if order.id == payment_data['merchant_uid'] and \
+        if order.id == int(payment_data['merchant_uid']) and \
             imp_uid == payment_data['imp_uid'] and \
             order.price.value == int(payment_data['amount']):
+            self.order = order
             return attrs
 
         raise ValidationError('주문 정보가 일치하지 않습니다.')
