@@ -17,7 +17,11 @@ from .test_models import (
     get_dummy_product_category,
     get_dummy_appmanager,
 )
-from ..models import GenderCategory
+from ..models import (
+    GenderCategory,
+    AgeCategory,
+    PriceCategory,
+)
 from user.models import User
 from user.tests.test_models import (
     get_jwt,
@@ -253,6 +257,132 @@ class ProductDetailViewTest(TestCase):
         ]
         self.assertTrue(all(key in product for key in required_keys))
         self.assertTrue(isinstance(product['image_url'], list))
+
+
+class AgeListViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.headers = jwt_to_headers(get_jwt(
+            'test@test.co.kr',
+            '1234'
+        ))
+        get_dummy_appmanager()
+
+        cls.ages_count = 3
+        for _ in range(cls.ages_count):
+            get_dummy_age()
+
+    def test_비인증(self):
+        res = self.client.get('/ages')
+        self.assertEqual(res.status_code, 401)
+
+    def test_정상조회(self):
+        res = self.client.get('/ages', **self.headers)
+        self.assertEqual(res.status_code, 200)
+
+        data = res.json()
+        self.assertTrue(data['success'])
+
+        ages = data['data']
+        self.assertTrue(isinstance(ages, list))
+        self.assertEqual(len(ages), self.ages_count)
+
+        age = ages[0]
+        required_keys = ['id', 'value']
+        self.assertTrue(all(key in age for key in required_keys))
+
+    def test_비활성_필터링(self):
+        AgeCategory.objects.filter(id=1).update(is_active=False)
+        res = self.client.get('/ages', **self.headers)
+        AgeCategory.objects.filter(id=1).update(is_active=True)
+        self.assertEqual(res.status_code, 200)
+
+        ages = res.json()['data']
+        self.assertEqual(len(ages), self.ages_count - 1)
+
+
+class GenderListViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.headers = jwt_to_headers(get_jwt(
+            'test@test.co.kr',
+            '1234'
+        ))
+        get_dummy_appmanager()
+
+        cls.genders_count = 3
+        for _ in range(cls.genders_count):
+            get_dummy_gender()
+
+    def test_비인증(self):
+        res = self.client.get('/genders')
+        self.assertEqual(res.status_code, 401)
+
+    def test_정상조회(self):
+        res = self.client.get('/genders', **self.headers)
+        self.assertEqual(res.status_code, 200)
+
+        data = res.json()
+        self.assertTrue(data['success'])
+
+        genders = data['data']
+        self.assertTrue(isinstance(genders, list))
+        self.assertEqual(len(genders), self.genders_count)
+
+        gender = genders[0]
+        required_keys = ['id', 'name']
+        self.assertTrue(all(key in gender for key in required_keys))
+
+    def test_비활성_필터링(self):
+        GenderCategory.objects.filter(id=1).update(is_active=False)
+        res = self.client.get('/genders', **self.headers)
+        GenderCategory.objects.filter(id=1).update(is_active=True)
+        self.assertEqual(res.status_code, 200)
+
+        genders = res.json()['data']
+        self.assertEqual(len(genders), self.genders_count - 1)
+
+
+class PriceListViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.headers = jwt_to_headers(get_jwt(
+            'test@test.co.kr',
+            '1234'
+        ))
+        get_dummy_appmanager()
+
+        cls.prices_count = 3
+        for _ in range(cls.prices_count):
+            get_dummy_price()
+
+    def test_비인증(self):
+        res = self.client.get('/prices')
+        self.assertEqual(res.status_code, 401)
+
+    def test_정상조회(self):
+        res = self.client.get('/prices', **self.headers)
+        self.assertEqual(res.status_code, 200)
+
+        data = res.json()
+        self.assertTrue(data['success'])
+
+        prices = data['data']
+        self.assertTrue(isinstance(prices, list))
+        self.assertEqual(len(prices), self.prices_count)
+
+        price = prices[0]
+        required_keys = ['id', 'value']
+        self.assertTrue(all(key in price for key in required_keys))
+
+    def test_비활성_필터링(self):
+        PriceCategory.objects.filter(id=1).update(is_active=False)
+        res = self.client.get('/prices', **self.headers)
+        PriceCategory.objects.filter(id=1).update(is_active=True)
+        self.assertEqual(res.status_code, 200)
+
+        prices = res.json()['data']
+        self.assertEqual(len(prices), self.prices_count - 1)
 
 
 class ErrorHandlerTest(TestCase):
