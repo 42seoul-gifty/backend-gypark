@@ -104,3 +104,51 @@ class PaymentValidationViewTest(TestCase):
         self.assertFalse(response.json().get('success'))
 
 
+class OrderListViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.headers = jwt_to_headers(get_jwt(
+            'test@test.co.kr',
+            '1234'
+        ))
+        get_dummy_appmanager()
+        get_dummy_product_category()
+        get_dummy_gender()
+        get_dummy_age()
+        get_dummy_price()
+        get_dummy_product()
+
+        cls.order_count = 3
+        for _ in range(cls.order_count):
+            get_dummy_order()
+
+    def test_비인증(self):
+        res = self.client.get('/users/1/orders')
+        self.assertEqual(res.status_code, 401)
+
+    def test_다른유저(self):
+        get_jwt(
+            'test2@test.co.kr',
+            '1234'
+        )
+        res = self.client.get('/users/2/orders', **self.headers)
+        self.assertEqual(res.status_code, 403)
+
+    def test_없는유저(self):
+        res = self.client.get('/users/42/orders', **self.headers)
+        self.assertEqual(res.status_code, 404)
+
+    def test_정상조회(self):
+        res = self.client.get('/users/1/orders', **self.headers)
+        self.assertEqual(res.status_code, 200)
+
+        data = res.json()
+        self.assertTrue(data['success'])
+
+        orders = data['data']
+        self.assertTrue(isinstance(orders, list))
+        self.assertEqual(len(orders), self.order_count)
+
+
+
+

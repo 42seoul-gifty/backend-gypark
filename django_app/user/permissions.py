@@ -20,9 +20,6 @@ class OwnerUrlPermission(BasePermission):
         except KeyError:
             return False
 
-        try:
-            user = User.objects.get(id=upk)
-        except User.DoesNotExist:
-            return False
+        user = get_object_or_404(User, id=upk)
 
         return request.user == user
