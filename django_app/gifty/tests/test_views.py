@@ -19,6 +19,10 @@ from .test_models import (
 )
 from ..models import GenderCategory
 from user.models import User
+from user.tests.test_models import (
+    get_jwt,
+    jwt_to_headers
+)
 
 
 def all_subsets(ss, start=0):
@@ -204,6 +208,51 @@ class ProductListViewTest(TestCase):
 
         ids_list = list(map(lambda row: row['id'], data))
         self.assertEqual(ids_list, list(range(7, 19)))
+
+
+class ProductDetailViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.headers = jwt_to_headers(get_jwt(
+            'test@test.co.kr',
+            '1234'
+        ))
+        get_dummy_appmanager()
+        get_dummy_age()
+        get_dummy_gender()
+        get_dummy_price()
+        get_dummy_product_category()
+        get_dummy_product()
+
+    def test_비인증(self):
+        res = self.client.get('/products/1')
+        self.assertEqual(res.status_code, 401)
+
+    def test_찾을수없음(self):
+        res = self.client.get('/products/2', **self.headers)
+        self.assertEqual(res.status_code, 404)
+
+    def test_정상조회(self):
+        res = self.client.get('/products/1', **self.headers)
+        self.assertEqual(res.status_code, 200)
+
+        data = res.json()
+        self.assertTrue(data['success'])
+
+        product = data['data']
+        self.assertTrue(isinstance(product, dict))
+
+        required_keys = [
+            'id',
+            'name',
+            'description',
+            'detail',
+            'thumbnail',
+            'image_url',
+            'price',
+        ]
+        self.assertTrue(all(key in product for key in required_keys))
+        self.assertTrue(isinstance(product['image_url'], list))
 
 
 class ErrorHandlerTest(TestCase):
