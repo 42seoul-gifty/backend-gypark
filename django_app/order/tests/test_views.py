@@ -16,6 +16,7 @@ from user.tests.test_models import (
 )
 from .test_models import get_dummy_order
 from gifty.models import PriceCategory
+from ..models import Order
 
 
 class PaymentValidationViewTest(TestCase):
@@ -150,5 +151,60 @@ class OrderListViewTest(TestCase):
         self.assertEqual(len(orders), self.order_count)
 
 
+class OrderCreateViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.headers = jwt_to_headers(get_jwt(
+            'test@test.co.kr',
+            '1234'
+        ))
+        get_dummy_appmanager()
+        get_dummy_product_category()
+        get_dummy_gender()
+        get_dummy_age()
+        get_dummy_age()
+        get_dummy_price()
+        get_dummy_product()
+
+    def test_비인증(self):
+        res = self.client.post('/users/1/orders')
+        self.assertEqual(res.status_code, 401)
+
+    def test_다른유저(self):
+        get_jwt(
+            'test2@test.co.kr',
+            '1234'
+        )
+        res = self.client.post('/users/2/orders', **self.headers)
+        self.assertEqual(res.status_code, 403)
+
+    def test_없는유저(self):
+        res = self.client.post('/users/42/orders', **self.headers)
+        self.assertEqual(res.status_code, 404)
+
+    def test_정상생성(self):
+        data = {
+            "giver_name": "test_giver",
+            "giver_phone": "01012345678",
+            "receiver_name": "test_receiver",
+            "receiver_phone": "01012345678",
+            "gender": [1],
+            "age": [1, 2],
+            "price": 1,
+        }
+        res = self.client.post('/users/1/orders', data=data, **self.headers)
+        self.assertEqual(res.status_code, 201)
+
+        res_data = res.json()
+        self.assertTrue(res_data['success'])
+
+        order = Order.objects.first()
+        self.assertTrue(order.giver_name == data['giver_name'])
+        self.assertTrue(order.giver_phone == data['giver_phone'])
+        self.assertTrue(order.receiver.name == data['receiver_name'])
+        self.assertTrue(order.receiver.phone == data['receiver_phone'])
+        self.assertTrue(list(order.gender.all().values_list('id', flat=True)) == data['gender'])
+        self.assertTrue(list(order.age.all().values_list('id', flat=True)) == data['age'])
+        self.assertTrue(order.price.id == data['price'])
 
 
