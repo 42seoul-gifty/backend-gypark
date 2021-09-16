@@ -9,6 +9,8 @@ from django.test import (
     Client
 )
 
+from schema import Schema
+
 from .test_models import (
     get_dummy_age,
     get_dummy_gender,
@@ -215,6 +217,21 @@ class ProductListViewTest(TestCase):
 
 
 class ProductDetailViewTest(TestCase):
+    success_schema = Schema(
+        {
+            'success': True,
+            'data': {
+                'id': int,
+                'name': str,
+                'description': str,
+                'detail': str,
+                'thumbnail': str,
+                'image_url': [str],
+                'price': int
+            }
+        }
+    )
+
     @classmethod
     def setUpTestData(cls):
         cls.headers = jwt_to_headers(get_jwt(
@@ -239,24 +256,7 @@ class ProductDetailViewTest(TestCase):
     def test_정상조회(self):
         res = self.client.get('/products/1', **self.headers)
         self.assertEqual(res.status_code, 200)
-
-        data = res.json()
-        self.assertTrue(data['success'])
-
-        product = data['data']
-        self.assertTrue(isinstance(product, dict))
-
-        required_keys = [
-            'id',
-            'name',
-            'description',
-            'detail',
-            'thumbnail',
-            'image_url',
-            'price',
-        ]
-        self.assertTrue(all(key in product for key in required_keys))
-        self.assertTrue(isinstance(product['image_url'], list))
+        self.assertTrue(self.success_schema.is_valid(res.json()))
 
 
 class AgeListViewTest(TestCase):
