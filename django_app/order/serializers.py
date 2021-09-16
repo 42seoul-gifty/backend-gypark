@@ -101,6 +101,7 @@ class ReceiverPatchSerializer(ModelSerializer):
 class ReceiverSerializer(ModelSerializer):
     address = SerializerMethodField()
     id = SerializerMethodField()
+    product = SerializerMethodField()
 
     class Meta:
         model = Receiver
@@ -120,6 +121,11 @@ class ReceiverSerializer(ModelSerializer):
 
     def get_id(self, obj):
         return obj.uuid
+
+    def get_product(self, obj):
+        if not obj.product:
+            return None
+        return ProductSerializer(obj.product).data
 
 
 class OrderCreateSerializer(ModelSerializer):
