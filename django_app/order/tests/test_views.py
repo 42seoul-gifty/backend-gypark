@@ -1,6 +1,12 @@
 import os
+from copy import deepcopy
 
 from django.test import TestCase
+
+from schema import (
+    Schema,
+    Or
+)
 
 from gifty.tests.test_models import (
     get_dummy_age,
@@ -10,11 +16,16 @@ from gifty.tests.test_models import (
     get_dummy_product_category,
     get_dummy_appmanager,
 )
+from gifty.tests.test_views import ProductDetailViewTest
 from user.tests.test_models import (
     get_jwt,
     jwt_to_headers,
 )
-from .test_models import get_dummy_order
+from .test_models import (
+    get_dummy_address,
+    get_dummy_order,
+    get_dummy_receiver
+)
 from gifty.models import PriceCategory
 from ..models import Order
 
@@ -208,3 +219,64 @@ class OrderCreateViewTest(TestCase):
         self.assertTrue(order.price.id == data['price'])
 
 
+class ReceiverDetailViewTest(TestCase):
+    success_dict = {
+        "success": True,
+        "data": {
+            "id": str,
+            "name": str,
+            "phone": str,
+            "product": Or(None, ProductDetailViewTest.success_schema.schema['data']),
+            "address": {
+                "post_code": str,
+                "address": str,
+                "detail": str,
+            }
+        },
+    }
+    success_schema = Schema(success_dict)
+
+    selected_product_dict = deepcopy(success_dict)
+    selected_product_dict['data']['product'] = ProductDetailViewTest.success_schema.schema['data']
+    selected_product_schema = Schema(selected_product_dict)
+
+    not_selected_product_dict = deepcopy(success_dict)
+    not_selected_product_dict['data']['product'] = None
+    not_selected_product_schema = Schema(not_selected_product_dict)
+
+    @classmethod
+    def setUpTestData(cls):
+        get_jwt(
+            'test@test.co.kr',
+            '1234'
+        )
+        get_dummy_appmanager()
+        get_dummy_product_category()
+        get_dummy_gender()
+        get_dummy_age()
+        get_dummy_age()
+        get_dummy_price()
+        product = get_dummy_product()
+        get_dummy_order()
+
+        cls.not_selected_product_receiver = get_dummy_receiver()
+        cls.selected_product_receiver = get_dummy_receiver(
+            product=product,
+        )
+        get_dummy_address(receiver_id=cls.selected_product_receiver.id)
+
+    def test_없는_수신자(self):
+        res = self.client.get(f'/receiver/42')
+        self.assertEqual(res.status_code, 404)
+
+    def test_상품을_선택한_수신자(self):
+        uuid = self.selected_product_receiver.uuid
+        res = self.client.get(f'/receiver/{uuid}')
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(self.selected_product_schema.is_valid(res.json()))
+
+    def test_상품을_선택하지않은_수신자(self):
+        uuid = self.not_selected_product_receiver.uuid
+        res = self.client.get(f'/receiver/{uuid}')
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(self.not_selected_product_schema.is_valid(res.json()))
