@@ -378,7 +378,7 @@ class OrderDeleteViewTest(TestCase):
         res = self.client.delete('/users/1/orders/42', **self.headers)
         self.assertEqual(res.status_code, 404)
 
-    def test_정상조회(self):
+    def test_정상삭제(self):
         res = self.client.delete('/users/1/orders/1', **self.headers)
         self.assertEqual(res.status_code, 204)
         self.assertFalse(Order.objects.exists())
