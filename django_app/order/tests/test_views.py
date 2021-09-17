@@ -280,3 +280,63 @@ class ReceiverDetailViewTest(TestCase):
         res = self.client.get(f'/receiver/{uuid}')
         self.assertEqual(res.status_code, 200)
         self.assertTrue(self.not_selected_product_schema.is_valid(res.json()))
+
+
+class OrderDetailViewTest(TestCase):
+    success_schema = Schema(
+        {
+            'success': True,
+            'data': {
+                'giver_name': str,
+                'giver_phone': str,
+                'receiver': ReceiverDetailViewTest.success_schema.schema['data'],
+                'order_date': str,
+                'preference': {
+                    'age': [int],
+                    'gender': [int],
+                    'price': int,
+                },
+                'status': str,
+            }
+        }
+    )
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.headers = jwt_to_headers(get_jwt(
+            'test@test.co.kr',
+            '1234'
+        ))
+        get_dummy_appmanager()
+        get_dummy_product_category()
+        get_dummy_gender()
+        get_dummy_age()
+        get_dummy_price()
+        get_dummy_product()
+        get_dummy_order()
+        get_dummy_receiver()
+
+    def test_비인증(self):
+        res = self.client.get('/users/1/orders/1')
+        self.assertEqual(res.status_code, 401)
+
+    def test_다른유저(self):
+        get_jwt(
+            'test2@test.co.kr',
+            '1234'
+        )
+        res = self.client.get('/users/2/orders/1', **self.headers)
+        self.assertEqual(res.status_code, 403)
+
+    def test_없는유저(self):
+        res = self.client.get('/users/42/orders/1', **self.headers)
+        self.assertEqual(res.status_code, 404)
+
+    def test_없는주문정보(self):
+        res = self.client.get('/users/1/orders/42', **self.headers)
+        self.assertEqual(res.status_code, 404)
+
+    def test_정상조회(self):
+        res = self.client.get('/users/1/orders/1', **self.headers)
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(self.success_schema.is_valid(res.json()))
