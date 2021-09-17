@@ -426,3 +426,40 @@ class OrderDeleteViewTest(TestCase):
         self.assertEqual(res.status_code, 204)
         self.assertFalse(Order.objects.exists())
         self.assertFalse(Receiver.objects.exists())
+
+
+class ReceiverDataSetViewTest(TestCase):
+    success_schema = Schema(
+        {
+            'success': True,
+            'data': {
+                'giver_name': str,
+                'giver_phone': str,
+                'products': [ProductDetailViewTest.success_schema.schema['data']]
+            }
+        }
+    )
+    @classmethod
+    def setUpTestData(cls):
+        cls.headers = jwt_to_headers(get_jwt(
+            'test@test.co.kr',
+            '1234'
+        ))
+        get_dummy_appmanager()
+        get_dummy_product_category()
+        get_dummy_gender()
+        get_dummy_age()
+        get_dummy_price()
+        get_dummy_product()
+        get_dummy_order()
+        cls.receiver = get_dummy_receiver()
+
+    def test_없는_수신자(self):
+        res = self.client.get('/receiver/42/choice')
+        self.assertEqual(res.status_code, 404)
+
+    def test_정상조회(self):
+        uuid = self.receiver.uuid
+        res = self.client.get(f'/receiver/{uuid}/choice')
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(self.success_schema.is_valid(res.json()))
