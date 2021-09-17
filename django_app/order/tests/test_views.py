@@ -27,7 +27,7 @@ from .test_models import (
     get_dummy_receiver
 )
 from gifty.models import PriceCategory
-from ..models import Order
+from ..models import Order, Receiver
 
 
 class PaymentValidationViewTest(TestCase):
@@ -340,3 +340,46 @@ class OrderDetailViewTest(TestCase):
         res = self.client.get('/users/1/orders/1', **self.headers)
         self.assertEqual(res.status_code, 200)
         self.assertTrue(self.success_schema.is_valid(res.json()))
+
+
+class OrderDeleteViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.headers = jwt_to_headers(get_jwt(
+            'test@test.co.kr',
+            '1234'
+        ))
+        get_dummy_appmanager()
+        get_dummy_product_category()
+        get_dummy_gender()
+        get_dummy_age()
+        get_dummy_price()
+        get_dummy_product()
+        get_dummy_order()
+        get_dummy_receiver()
+
+    def test_비인증(self):
+        res = self.client.delete('/users/1/orders/1')
+        self.assertEqual(res.status_code, 401)
+
+    def test_다른유저(self):
+        get_jwt(
+            'test2@test.co.kr',
+            '1234'
+        )
+        res = self.client.delete('/users/2/orders/1', **self.headers)
+        self.assertEqual(res.status_code, 403)
+
+    def test_없는유저(self):
+        res = self.client.delete('/users/42/orders/1', **self.headers)
+        self.assertEqual(res.status_code, 404)
+
+    def test_없는주문정보(self):
+        res = self.client.delete('/users/1/orders/42', **self.headers)
+        self.assertEqual(res.status_code, 404)
+
+    def test_정상조회(self):
+        res = self.client.delete('/users/1/orders/1', **self.headers)
+        self.assertEqual(res.status_code, 204)
+        self.assertFalse(Order.objects.exists())
+        self.assertFalse(Receiver.objects.exists())
