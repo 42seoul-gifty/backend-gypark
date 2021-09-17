@@ -282,6 +282,49 @@ class ReceiverDetailViewTest(TestCase):
         self.assertTrue(self.not_selected_product_schema.is_valid(res.json()))
 
 
+class ReceiverPatchViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        get_jwt(
+            'test@test.co.kr',
+            '1234'
+        )
+        get_dummy_appmanager()
+        get_dummy_product_category()
+        get_dummy_gender()
+        get_dummy_age()
+        get_dummy_age()
+        get_dummy_price()
+        get_dummy_product()
+        get_dummy_order()
+        cls.receiver = get_dummy_receiver()
+
+    def test_없는_수신자(self):
+        res = self.client.patch('/receiver/42')
+        self.assertEqual(res.status_code, 404)
+
+    def test_정상수정(self):
+        data = {
+            'product_id': 1,
+            'post_code': '우편 번호',
+            'address': '주소',
+            'address_detail': '상세 주소',
+            'likes': [1],
+            'dislikes': [],
+        }
+        uuid = self.receiver.uuid
+        res = self.client.patch(f'/receiver/{uuid}', data=data, content_type='application/json')
+
+        receiver = Receiver.objects.get(id=self.receiver.id)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(receiver.product_id, data['product_id']),
+        self.assertEqual(list(receiver.likes.all().values_list('id', flat=True)), data['likes'])
+        self.assertEqual(list(receiver.dislikes.all().values_list('id', flat=True)), data['dislikes'])
+        self.assertEqual(receiver.address.address, data['address'])
+        self.assertEqual(receiver.address.detail, data['address_detail'])
+        self.assertEqual(receiver.address.post_code, data['post_code'])
+
+
 class OrderDetailViewTest(TestCase):
     success_schema = Schema(
         {

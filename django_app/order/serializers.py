@@ -59,7 +59,7 @@ class ReceiverPatchSerializer(ModelSerializer):
 
     product_id = ChoiceProductField()
     address = CharField(write_only=True)
-    detail = CharField(write_only=True, allow_blank=True)
+    address_detail = CharField(write_only=True, allow_blank=True)
     post_code = CharField(write_only=True)
     likes = ChoiceProductField(many=True)
     dislikes = ChoiceProductField(many=True)
@@ -69,7 +69,7 @@ class ReceiverPatchSerializer(ModelSerializer):
         fields = (
             'product_id',
             'address',
-            'detail',
+            'address_detail',
             'post_code',
             'likes',
             'dislikes',
@@ -82,7 +82,7 @@ class ReceiverPatchSerializer(ModelSerializer):
         self.address_serializer = AddressSerializer(
             data={
                 'address': attrs.pop('address'),
-                'detail': attrs.pop('detail'),
+                'detail': attrs.pop('address_detail'),
                 'post_code': attrs.pop('post_code'),
             }
         )
