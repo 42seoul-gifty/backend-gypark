@@ -4,11 +4,11 @@ from dj_rest_auth.views import (
     LoginView,
     LogoutView
 )
-from dj_rest_auth.jwt_auth import get_refresh_view
 
 from .views import (
     KakaoLoginView,
     NaverLoginView,
+    TokenRefreshView,
     UserDetailView
 )
 
@@ -20,7 +20,7 @@ urlpatterns = [
     path('login/naver', NaverLoginView.as_view(), name='lgoin_naver'),
     path('login', LoginView.as_view(), name='login'),
     path('logout', LogoutView.as_view(), name='logout'),
-    path('token/refresh', get_refresh_view().as_view(), name='token_refresh'),
+    path('token/refresh', TokenRefreshView.as_view(), name='token_refresh'),
 
     path('users/<int:pk>', UserDetailView.as_view(), name='detail'),
 ]

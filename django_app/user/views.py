@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_400_BAD_REQUEST
 
 from dj_rest_auth.registration.views import SocialLoginView
+from dj_rest_auth.jwt_auth import get_refresh_view
 
 from allauth.socialaccount.providers.kakao.views import KakaoOAuth2Adapter
 from allauth.socialaccount.providers.naver.views import NaverOAuth2Adapter
@@ -39,6 +40,18 @@ class NaverLoginView(CustomSocialLoginView):
     adapter_class = NaverOAuth2Adapter
     callback_url = settings.NAVER_CALLBACK_URI
     client_class = OAuth2Client
+
+
+class TokenRefreshView(get_refresh_view()):
+    def post(self, request, *args, **kwargs):
+        request.data._mutable = True
+        request.data['refresh'] = request.data['refresh_token']
+        return super().post(request, *args, **kwargs)
+
+    def finalize_response(self, request, response, *args, **kwargs):
+        response.data['access_token'] = response.data.pop('access', '')
+        response.data['refresh_token'] = response.data.pop('refresh', '')
+        return super().finalize_response(request, response, *args, **kwargs)
 
 
 class UserDetailView(RetrieveAPIView):

@@ -184,3 +184,32 @@ class NaverLoginViewTest(TestCase):
         code = parse_qs(parsed.query)['code'][0]
 
         return code
+
+
+class TokenRefreshViewTest(TestCase):
+    success_schema = Schema(
+        {
+            'success': True,
+            'data': {
+                'access_token': str,
+                'refresh_token': str,
+            }
+        }
+    )
+    @classmethod
+    def setUpTestData(cls):
+        cls.jwt = get_jwt(
+            'test@test.co.kr',
+            '1234'
+        )
+
+    def test_없는_토큰(self):
+        data = {'refresh_token': '42'}
+        res = self.client.post('/token/refresh', data=data)
+        self.assertEqual(res.status_code, 401)
+
+    def test_정상_리프레시(self):
+        data = {'refresh_token': self.jwt['refresh_token']}
+        res = self.client.post('/token/refresh', data=data)
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(self.success_schema.is_valid(res.json()))
