@@ -213,3 +213,29 @@ class TokenRefreshViewTest(TestCase):
         res = self.client.post('/token/refresh', data=data)
         self.assertEqual(res.status_code, 200)
         self.assertTrue(self.success_schema.is_valid(res.json()))
+
+
+class LogoutViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.jwt = get_jwt(
+            'test@test.co.kr',
+            '1234'
+        )
+
+    def test_없는_토큰(self):
+        data = {'refresh_token': '42'}
+        res = self.client.post('/logout', data=data)
+        self.assertEqual(res.status_code, 401)
+
+    def test_정상_로그아웃(self):
+        data = {'refresh_token': self.jwt['refresh_token']}
+        res = self.client.post('/logout', data=data)
+        self.assertEqual(res.status_code, 200)
+
+        headers = jwt_to_headers(self.jwt)
+        res = self.client.get('/users/1', **headers)
+        self.assertEqual(res.status_code, 200)
+
+        res = self.client.post('/token/refresh', data=data)
+        self.assertEqual(res.status_code, 401)

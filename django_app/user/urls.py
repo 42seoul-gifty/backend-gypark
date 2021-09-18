@@ -1,15 +1,13 @@
 from django.urls import path
 
-from dj_rest_auth.views import (
-    LoginView,
-    LogoutView
-)
+from dj_rest_auth.views import LoginView
 
 from .views import (
     KakaoLoginView,
     NaverLoginView,
     TokenRefreshView,
-    UserDetailView
+    UserDetailView,
+    LogoutView
 )
 
 

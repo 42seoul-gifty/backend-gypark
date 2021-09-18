@@ -7,6 +7,7 @@ from rest_framework.status import HTTP_400_BAD_REQUEST
 
 from dj_rest_auth.registration.views import SocialLoginView
 from dj_rest_auth.jwt_auth import get_refresh_view
+from dj_rest_auth.views import LogoutView
 
 from allauth.socialaccount.providers.kakao.views import KakaoOAuth2Adapter
 from allauth.socialaccount.providers.naver.views import NaverOAuth2Adapter
@@ -52,6 +53,13 @@ class TokenRefreshView(get_refresh_view()):
         response.data['access_token'] = response.data.pop('access', '')
         response.data['refresh_token'] = response.data.pop('refresh', '')
         return super().finalize_response(request, response, *args, **kwargs)
+
+
+class LogoutView(LogoutView):
+    def post(self, request, *args, **kwargs):
+        request.data._mutable = True
+        request.data['refresh'] = request.data.get('refresh_token')
+        return self.logout(request)
 
 
 class UserDetailView(RetrieveAPIView):
