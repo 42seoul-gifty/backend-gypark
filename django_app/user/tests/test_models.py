@@ -1,5 +1,7 @@
 from django.test import Client
 
+from allauth.socialaccount.models import SocialApp
+
 from ..models import User
 
 
@@ -19,4 +21,10 @@ def get_jwt(email, password):
 
 def jwt_to_headers(jwt):
     return {'HTTP_AUTHORIZATION': f'Bearer {jwt.get("access_token")}'}
+
+
+def get_dummy_socialapp(**kwargs):
+    socialapp = SocialApp.objects.create(**kwargs)
+    socialapp.sites.add(1)
+    return socialapp
 
