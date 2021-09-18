@@ -130,3 +130,57 @@ class KakaoLoginViewTest(TestCase):
         code = parse_qs(parsed.query)['code'][0]
 
         return code
+
+
+class NaverLoginViewTest(TestCase):
+    success_schema = KakaoLoginViewTest.success_schema
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.redirect_uri = settings.NAVER_CALLBACK_URI
+        cls.client_id = os.environ['TEST_NAVER_CLIENT_ID']
+        cls.secret = os.environ['TEST_NAVER_SECRET']
+        cls.browser = webdriver.Chrome(os.environ['TEST_CHROMEDRIVER_PATH'])
+
+        get_dummy_socialapp(
+            provider='naver',
+            name='네이버',
+            client_id=cls.client_id,
+            secret=cls.secret
+        )
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.browser.close()
+
+    @tag('selenium')
+    def test_없는_인가코드(self):
+        client = Client(raise_request_exception=False)
+        code = '42'
+        res = client.get('/login/naver', **{'HTTP_Authorization-Code': code})
+        self.assertEqual(res.status_code, 500)
+
+    @tag('selenium')
+    def test_정상로그인(self):
+        code = self._get_naver_auth_code()
+        res = self.client.get('/login/naver', **{'HTTP_Authorization-Code': code})
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(self.success_schema.is_valid(res.json()))
+
+        user = User.objects.first()
+        self.assertEqual(user.socialaccount_set.first().provider, 'naver')
+        self.assertTrue(user.nickname)
+
+    def _get_naver_auth_code(self):
+        url = (' https://nid.naver.com/oauth2.0/authorize?'
+              f'client_id={self.client_id}&'
+              f'redirect_uri={self.redirect_uri}&'
+              f'response_type=code')
+        self.browser.get(url)
+        wait = WebDriverWait(self.browser, 600)
+        wait.until(lambda b: urlparse(b.current_url).hostname == 'localhost')
+
+        parsed = urlparse(self.browser.current_url)
+        code = parse_qs(parsed.query)['code'][0]
+
+        return code
