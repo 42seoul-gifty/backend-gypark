@@ -463,3 +463,14 @@ class ReceiverDataSetViewTest(TestCase):
         res = self.client.get(f'/receiver/{uuid}/choice')
         self.assertEqual(res.status_code, 200)
         self.assertTrue(self.success_schema.is_valid(res.json()))
+
+    def test_카테고리_비활성화시_상품리스트_필터링(self):
+        uuid = self.receiver.uuid
+        PriceCategory.objects.update(is_active=False)
+        res = self.client.get(f'/receiver/{uuid}/choice')
+        PriceCategory.objects.update(is_active=True)
+
+        self.assertEqual(res.status_code, 200)
+
+        products = res.json()['data']['products']
+        self.assertEqual(len(products), 1)

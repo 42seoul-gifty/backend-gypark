@@ -119,7 +119,7 @@ class Receiver(BaseModel):
             'gender__in': order.gender.all(),
             'age__in': order.age.all()
         }
-        return Product.objects.actived().filter(**filter_kwargs)
+        return Product.objects.filter(**filter_kwargs)
 
     @staticmethod
     def get_available_or_404(uuid):
