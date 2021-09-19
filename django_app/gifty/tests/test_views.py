@@ -260,6 +260,18 @@ class ProductDetailViewTest(TestCase):
 
 
 class AgeListViewTest(TestCase):
+    success_schema = Schema(
+        {
+            'success': bool,
+            'data': [
+                {
+                    'id': int,
+                    'value': str
+                }
+            ]
+        }
+    )
+
     @classmethod
     def setUpTestData(cls):
         cls.headers = jwt_to_headers(get_jwt(
@@ -279,17 +291,7 @@ class AgeListViewTest(TestCase):
     def test_정상조회(self):
         res = self.client.get('/ages', **self.headers)
         self.assertEqual(res.status_code, 200)
-
-        data = res.json()
-        self.assertTrue(data['success'])
-
-        ages = data['data']
-        self.assertTrue(isinstance(ages, list))
-        self.assertEqual(len(ages), self.ages_count)
-
-        age = ages[0]
-        required_keys = ['id', 'value']
-        self.assertTrue(all(key in age for key in required_keys))
+        self.assertTrue(self.success_schema.is_valid(res.json()))
 
     def test_비활성_필터링(self):
         AgeCategory.objects.filter(id=1).update(is_active=False)
@@ -302,6 +304,18 @@ class AgeListViewTest(TestCase):
 
 
 class GenderListViewTest(TestCase):
+    success_schema = Schema(
+        {
+            'success': bool,
+            'data': [
+                {
+                    'id': int,
+                    'name': str
+                }
+            ]
+        }
+    )
+
     @classmethod
     def setUpTestData(cls):
         cls.headers = jwt_to_headers(get_jwt(
@@ -321,17 +335,7 @@ class GenderListViewTest(TestCase):
     def test_정상조회(self):
         res = self.client.get('/genders', **self.headers)
         self.assertEqual(res.status_code, 200)
-
-        data = res.json()
-        self.assertTrue(data['success'])
-
-        genders = data['data']
-        self.assertTrue(isinstance(genders, list))
-        self.assertEqual(len(genders), self.genders_count)
-
-        gender = genders[0]
-        required_keys = ['id', 'name']
-        self.assertTrue(all(key in gender for key in required_keys))
+        self.assertTrue(self.success_schema.is_valid(res.json()))
 
     def test_비활성_필터링(self):
         GenderCategory.objects.filter(id=1).update(is_active=False)
@@ -344,6 +348,18 @@ class GenderListViewTest(TestCase):
 
 
 class PriceListViewTest(TestCase):
+    success_schema = Schema(
+        {
+            'success': bool,
+            'data': [
+                {
+                    'id': int,
+                    'value': int
+                }
+            ]
+        }
+    )
+
     @classmethod
     def setUpTestData(cls):
         cls.headers = jwt_to_headers(get_jwt(
@@ -363,17 +379,7 @@ class PriceListViewTest(TestCase):
     def test_정상조회(self):
         res = self.client.get('/prices', **self.headers)
         self.assertEqual(res.status_code, 200)
-
-        data = res.json()
-        self.assertTrue(data['success'])
-
-        prices = data['data']
-        self.assertTrue(isinstance(prices, list))
-        self.assertEqual(len(prices), self.prices_count)
-
-        price = prices[0]
-        required_keys = ['id', 'value']
-        self.assertTrue(all(key in price for key in required_keys))
+        self.assertTrue(self.success_schema.is_valid(res.json()))
 
     def test_비활성_필터링(self):
         PriceCategory.objects.filter(id=1).update(is_active=False)
