@@ -6,6 +6,7 @@ from .views import (
     PaymentValidationView,
     ReceiverDetailUpdateView,
     ReceiverDataSetView,
+    ReceiverSendSMSView,
 )
 
 
@@ -19,4 +20,5 @@ urlpatterns = [
 
     path('receiver/<str:uuid>', ReceiverDetailUpdateView.as_view(), name='receiver_detail'),
     path('receiver/<str:uuid>/choice', ReceiverDataSetView.as_view(), name='choice_dataset'),
+    path('receiver/<str:uuid>/send', ReceiverSendSMSView.as_view(), name='send_sms'),
 ]

@@ -3,6 +3,7 @@ import random
 
 from django.db import models
 from django.shortcuts import get_object_or_404
+from django.conf import settings
 
 from gifty.models import (
     BaseModel,
@@ -86,6 +87,10 @@ class Receiver(BaseModel):
     uuid = models.CharField(
         max_length=6
     )
+    sms_response = models.TextField(
+        'sms 발송 결과',
+        blank=True
+    )
 
     @property
     def user(self):
@@ -93,7 +98,7 @@ class Receiver(BaseModel):
 
     @property
     def link(self):
-        return f'front-host/receiver/{self.uuid}'
+        return f'{settings.FRONT_HOST}/receiver/{self.uuid}'
 
     def set_uuid(self):
         # https://stackoverflow.com/questions/13484726/safe-enough-8-character-short-unique-random-string
@@ -120,6 +125,10 @@ class Receiver(BaseModel):
             'age__in': order.age.all()
         }
         return Product.objects.filter(**filter_kwargs)
+
+    @property
+    def sms_message(self):
+        return f'{self.order.giver_name}님이 보내신 선물이 도착했습니다. {self.link}'
 
     @staticmethod
     def get_available_or_404(uuid):

@@ -1,7 +1,10 @@
 import os
 from copy import deepcopy
 
-from django.test import TestCase
+from django.test import (
+    TestCase,
+    tag
+)
 
 from schema import (
     And,
@@ -484,3 +487,37 @@ class ReceiverDataSetViewTest(TestCase):
 
         products = res.json()['data']['products']
         self.assertEqual(len(products), 1)
+
+
+class ReceiverSendSMSViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.headers = jwt_to_headers(get_jwt(
+            'test@test.co.kr',
+            '1234'
+        ))
+        get_dummy_appmanager()
+        get_dummy_product_category()
+        get_dummy_gender()
+        get_dummy_age()
+        get_dummy_age()
+        get_dummy_price()
+        get_dummy_product()
+
+        test_data = {
+            'giver_phone': os.environ['TEST_GIVER_PHONE'],
+            'giver_name': '송신자',
+        }
+        get_dummy_order(**test_data)
+
+        test_data = {
+            'phone': os.environ['TEST_GIVER_PHONE'],
+            'name': '수신자',
+        }
+        cls.receiver = get_dummy_receiver(**test_data)
+
+    @tag('need_pay')
+    def test_정상발송(self):
+        uuid = self.receiver.uuid
+        res = self.client.post(f'/receiver/{uuid}/send', **self.headers)
+        self.assertEqual(res.status_code, 202)

@@ -180,3 +180,9 @@ IMP_SECRET = COMMON_SECRET['imp_secret']
 
 KAKAO_CALLBACK_URI = COMMON_SECRET['kakao_callback_uri']
 NAVER_CALLBACK_URI = COMMON_SECRET['naver_callback_uri']
+
+NCLOUD_SERVICE_ID = COMMON_SECRET['ncloud_service_id']
+NCLOUD_ACCESS_KEY = COMMON_SECRET['ncloud_access_key']
+NCLOUD_SECRET = COMMON_SECRET['ncloud_secret']
+
+FRONT_HOST = COMMON_SECRET['front_host']
