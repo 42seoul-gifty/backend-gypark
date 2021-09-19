@@ -4,6 +4,7 @@ from copy import deepcopy
 from django.test import TestCase
 
 from schema import (
+    And,
     Schema,
     Or
 )
@@ -163,6 +164,16 @@ class OrderListViewTest(TestCase):
 
 
 class OrderCreateViewTest(TestCase):
+    success_schema = Schema(
+        {
+            'success': bool,
+            'data': {
+                'merchant_uid': int,
+                'receiver_id': And([str], len)
+            }
+        }
+    )
+
     @classmethod
     def setUpTestData(cls):
         cls.headers = jwt_to_headers(get_jwt(
@@ -206,8 +217,7 @@ class OrderCreateViewTest(TestCase):
         res = self.client.post('/users/1/orders', data=data, **self.headers)
         self.assertEqual(res.status_code, 201)
 
-        res_data = res.json()
-        self.assertTrue(res_data['success'])
+        self.assertTrue(self.success_schema.is_valid(res.json()))
 
         order = Order.objects.first()
         self.assertTrue(order.giver_name == data['giver_name'])

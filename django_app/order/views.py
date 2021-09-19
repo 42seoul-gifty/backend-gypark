@@ -39,7 +39,10 @@ class OrderListCreateView(ListCreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         order = serializer.save()
-        data = {'merchant_uid': order.id}
+        data = {
+            'merchant_uid': order.id,
+            'receiver_id': order.receivers.values_list('uuid', flat=True),
+        }
 
         return Response(data, HTTP_201_CREATED)
 
