@@ -31,7 +31,10 @@ from .test_models import (
     get_dummy_order,
     get_dummy_receiver
 )
-from gifty.models import PriceCategory
+from gifty.models import (
+    PriceCategory,
+    Product
+)
 from ..models import Order, Receiver
 from ..sms import search_sms_request
 
@@ -489,6 +492,17 @@ class ReceiverDataSetViewTest(TestCase):
 
         products = res.json()['data']['products']
         self.assertEqual(len(products), 1)
+
+    def test_상품자체_비활성화_필터링(self):
+        uuid = self.receiver.uuid
+        Product.objects.update(is_active=False)
+        res = self.client.get(f'/receiver/{uuid}/choice')
+        Product.objects.update(is_active=True)
+
+        self.assertEqual(res.status_code, 200)
+
+        products = res.json()['data']['products']
+        self.assertEqual(len(products), 0)
 
 
 class ReceiverSendSMSViewTest(TestCase):

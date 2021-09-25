@@ -22,7 +22,7 @@ from .filters import ProductFilter
 class ProductDetailView(RetrieveAPIView):
     permission_classes = (IsAuthenticated, )
     serializer_class = ProductSerializer
-    queryset = Product.objects.actived()
+    queryset = Product.objects.actived_for_giver()
 
 
 class ProductListView(ListAPIView):
@@ -31,7 +31,7 @@ class ProductListView(ListAPIView):
     filterset_class = ProductFilter
 
     def get_queryset(self):
-        return Product.objects.actived()
+        return Product.objects.actived_for_giver()
 
 
 class AgeListView(ListAPIView):

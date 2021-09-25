@@ -124,11 +124,11 @@ class TestProductActivedFilter(TestCase):
         self.prices.update(is_active=True)
 
     def test_모두_활성(self):
-        self.assertEqual(Product.objects.actived().count(), 1)
+        self.assertEqual(Product.objects.actived_for_giver().count(), 1)
 
     def test_가격_비활성(self):
         self.prices.update(is_active=False)
-        self.assertEqual(Product.objects.actived().count(), 0)
+        self.assertEqual(Product.objects.actived_for_giver().count(), 0)
 
     def test_성별_일부_비활성(self):
         gender = self.genders.first()
@@ -138,7 +138,7 @@ class TestProductActivedFilter(TestCase):
         '''
         상품에 활성화된 성별이 있으므로 상품은 활성화됨
         '''
-        self.assertEqual(Product.objects.actived().count(), 1)
+        self.assertEqual(Product.objects.actived_for_giver().count(), 1)
 
     def test_성별_모두_비활성(self):
         self.genders.update(is_active=False)
@@ -146,7 +146,7 @@ class TestProductActivedFilter(TestCase):
         '''
         상품에 활성화된 성별이 없으므로 상품은 비활성
         '''
-        self.assertEqual(Product.objects.actived().count(), 0)
+        self.assertEqual(Product.objects.actived_for_giver().count(), 0)
 
     def test_나이_일부_비활성(self):
         age = self.ages.first()
@@ -156,7 +156,7 @@ class TestProductActivedFilter(TestCase):
         '''
         상품에 활성화된 나이가 있으므로 상품은 활성화됨
         '''
-        self.assertEqual(Product.objects.actived().count(), 1)
+        self.assertEqual(Product.objects.actived_for_giver().count(), 1)
 
     def test_나이_모두_비활성(self):
         self.ages.update(is_active=False)
@@ -164,4 +164,4 @@ class TestProductActivedFilter(TestCase):
         '''
         상품에 활성화된 나이가 없으므로 상품은 비활성
         '''
-        self.assertEqual(Product.objects.actived().count(), 0)
+        self.assertEqual(Product.objects.actived_for_giver().count(), 0)
