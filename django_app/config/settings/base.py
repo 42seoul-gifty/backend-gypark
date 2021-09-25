@@ -186,3 +186,5 @@ NCLOUD_ACCESS_KEY = COMMON_SECRET['ncloud_access_key']
 NCLOUD_SECRET = COMMON_SECRET['ncloud_secret']
 
 FRONT_HOST = COMMON_SECRET['front_host']
+
+SMS_PHONE_NUMBER = COMMON_SECRET['sms_phone_number']

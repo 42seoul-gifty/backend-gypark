@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseServerError
+from django.conf import settings
 
 from rest_framework.generics import (
     ListCreateAPIView,
@@ -110,13 +111,13 @@ class ReceiverSendSMSView(GenericAPIView):
         receiver = Receiver.get_available_or_404(kwargs['uuid'])
         self.check_object_permissions(request, receiver)
 
-        res = send_sms(
-            receiver.order.giver_phone,
-            content=receiver.sms_message,
-            messages=[
+        res = send_sms(**{
+            'from': settings.SMS_PHONE_NUMBER,
+            'content': receiver.sms_message,
+            'messages': [
                 {'to': receiver.phone}
             ]
-        )
+        })
 
         receiver.sms_response = res.text
         receiver.save()

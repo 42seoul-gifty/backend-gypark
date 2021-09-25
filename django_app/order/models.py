@@ -1,5 +1,6 @@
 import string
 import random
+import json
 
 from django.db import models
 from django.shortcuts import get_object_or_404
@@ -129,6 +130,10 @@ class Receiver(BaseModel):
     @property
     def sms_message(self):
         return f'{self.order.giver_name}님이 보내신 선물이 도착했습니다. {self.link}'
+
+    @property
+    def sms_request_id(self):
+        return json.loads(self.sms_response)['requestId']
 
     @staticmethod
     def get_available_or_404(uuid):
