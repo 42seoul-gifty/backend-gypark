@@ -1,6 +1,7 @@
 import os
 from copy import deepcopy
 
+from django.conf import settings
 from django.test import (
     TestCase,
     tag
@@ -32,6 +33,7 @@ from .test_models import (
 )
 from gifty.models import PriceCategory
 from ..models import Order, Receiver
+from ..sms import search_sms_request
 
 
 class PaymentValidationViewTest(TestCase):
@@ -503,21 +505,22 @@ class ReceiverSendSMSViewTest(TestCase):
         get_dummy_age()
         get_dummy_price()
         get_dummy_product()
-
-        test_data = {
-            'giver_phone': os.environ['TEST_GIVER_PHONE'],
-            'giver_name': '송신자',
-        }
-        get_dummy_order(**test_data)
-
-        test_data = {
-            'phone': os.environ['TEST_GIVER_PHONE'],
-            'name': '수신자',
-        }
-        cls.receiver = get_dummy_receiver(**test_data)
+        get_dummy_order(giver_name='송신자')
+        cls.receiver = get_dummy_receiver(
+            phone=os.environ['TEST_RECEIVER_PHONE'],
+            name='수신자'
+        )
 
     @tag('need_pay')
     def test_정상발송(self):
         uuid = self.receiver.uuid
         res = self.client.post(f'/receiver/{uuid}/send', **self.headers)
         self.assertEqual(res.status_code, 202)
+
+        self.receiver = Receiver.objects.first()
+        res = search_sms_request(self.receiver.sms_request_id)
+        self.assertEqual(res.status_code, 200)
+
+        message = res.json()['messages'][0]
+        self.assertEqual(message['from'], settings.SMS_PHONE_NUMBER)
+        self.assertEqual(message['to'], self.receiver.phone)
