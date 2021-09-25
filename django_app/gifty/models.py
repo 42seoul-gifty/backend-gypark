@@ -188,6 +188,10 @@ class Product(BaseModel):
     margin_rate = models.FloatField(
         '마진율'
     )
+    is_active = models.BooleanField(
+        '활성화',
+        default=True
+    )
     objects = ProductManager()
 
     class Meta:

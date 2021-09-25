@@ -23,6 +23,7 @@ from ..models import (
     GenderCategory,
     AgeCategory,
     PriceCategory,
+    Product,
 )
 from user.models import User
 from user.tests.test_models import (
@@ -214,6 +215,42 @@ class ProductListViewTest(TestCase):
 
         ids_list = list(map(lambda row: row['id'], data))
         self.assertEqual(ids_list, list(range(7, 19)))
+
+    def test_상품_자체_비활성(self):
+        '''
+        상품  1: 성별=(1,)     나이=(1,)     가격=1 X
+        상품  2: 성별=(1,)     나이=(1,)     가격=2 X
+        상품  3: 성별=(1,)     나이=(2,)     가격=1 X
+        상품  4: 성별=(1,)     나이=(2,)     가격=2 X
+        상품  5: 성별=(1,)     나이=(1, 2)   가격=1 X
+        상품  6: 성별=(1,)     나이=(1, 2)   가격=2 X
+        상품  7: 성별=(2,)     나이=(1,)     가격=1 X
+        상품  8: 성별=(2,)     나이=(1,)     가격=2 X
+        상품  9: 성별=(2,)     나이=(2,)     가격=1 X
+        상품 10: 성별=(2,)     나이=(2,)     가격=2 O
+        상품 11: 성별=(2,)     나이=(1, 2)   가격=1 O
+        상품 12: 성별=(2,)     나이=(1, 2)   가격=2 O
+        상품 13: 성별=(1, 2)   나이=(1,)     가격=1 O
+        상품 14: 성별=(1, 2)   나이=(1,)     가격=2 O
+        상품 15: 성별=(1, 2)   나이=(2,)     가격=1 O
+        상품 16: 성별=(1, 2)   나이=(2,)     가격=2 O
+        상품 17: 성별=(1, 2)   나이=(1, 2)   가격=1 O
+        상품 18: 성별=(1, 2)   나이=(1, 2)   가격=2 O
+        '''
+        Product.objects.filter(id__lte=9).update(is_active=False)
+        response = self.client.get(
+            '/products',
+            **self.auth
+        )
+        Product.objects.filter(id__lte=9).update(is_active=True)
+
+        self.assertEqual(response.status_code, 200)
+
+        data = response.json()['data']
+        self.assertEqual(len(data), 9)
+
+        ids_list = list(map(lambda row: row['id'], data))
+        self.assertEqual(ids_list, list(range(10, 19)))
 
 
 class ProductDetailViewTest(TestCase):
