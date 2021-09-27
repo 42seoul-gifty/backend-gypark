@@ -146,7 +146,7 @@ class Address(BaseModel):
     address = models.CharField(
         max_length=128,
     )
-    detail = models.CharField(
+    address_detail = models.CharField(
         max_length=128,
         blank=True
     )

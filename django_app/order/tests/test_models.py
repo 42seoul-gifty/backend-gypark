@@ -32,7 +32,7 @@ def get_dummy_receiver(**kwargs):
 
 def get_dummy_address(**kwargs):
     kwargs.setdefault('address', '주소')
-    kwargs.setdefault('detail', '상세주소')
+    kwargs.setdefault('address_detail', '상세주소')
     kwargs.setdefault('post_code', '우편번호')
     kwargs.setdefault('receiver_id', 1)
 
