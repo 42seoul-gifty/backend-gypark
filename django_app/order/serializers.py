@@ -29,7 +29,7 @@ class AddressSerializer(ModelSerializer):
         fields = (
             'post_code',
             'address',
-            'detail'
+            'address_detail'
         )
 
     def create(self, validated_data):
@@ -82,7 +82,7 @@ class ReceiverPatchSerializer(ModelSerializer):
         self.address_serializer = AddressSerializer(
             data={
                 'address': attrs.pop('address'),
-                'detail': attrs.pop('address_detail'),
+                'address_detail': attrs.pop('address_detail'),
                 'post_code': attrs.pop('post_code'),
             }
         )

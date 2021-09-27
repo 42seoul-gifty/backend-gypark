@@ -248,7 +248,7 @@ class ReceiverDetailViewTest(TestCase):
             "address": {
                 "post_code": str,
                 "address": str,
-                "detail": str,
+                "address_detail": str,
             }
         },
     }
@@ -339,7 +339,7 @@ class ReceiverPatchViewTest(TestCase):
         self.assertEqual(list(receiver.likes.all().values_list('id', flat=True)), data['likes'])
         self.assertEqual(list(receiver.dislikes.all().values_list('id', flat=True)), data['dislikes'])
         self.assertEqual(receiver.address.address, data['address'])
-        self.assertEqual(receiver.address.detail, data['address_detail'])
+        self.assertEqual(receiver.address.address_detail, data['address_detail'])
         self.assertEqual(receiver.address.post_code, data['post_code'])
 
 
