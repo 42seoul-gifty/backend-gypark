@@ -349,6 +349,7 @@ class OrderDetailViewTest(TestCase):
         {
             'success': True,
             'data': {
+                'id': int,
                 'giver_name': str,
                 'giver_phone': str,
                 'receiver': ReceiverDetailViewTest.success_schema.schema['data'],
