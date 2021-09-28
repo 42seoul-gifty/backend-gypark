@@ -174,6 +174,7 @@ class OrderSerializer(ModelSerializer):
     class Meta:
         model = Order
         fields = (
+            'id',
             'giver_name',
             'giver_phone',
             'receiver',
