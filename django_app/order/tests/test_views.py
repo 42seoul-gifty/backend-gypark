@@ -176,6 +176,7 @@ class OrderCreateViewTest(TestCase):
         {
             'success': bool,
             'data': {
+                'id': int,
                 'merchant_uid': str,
                 'receiver_id': And([str], len)
             }
