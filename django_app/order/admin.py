@@ -1,7 +1,10 @@
 from django.contrib import admin
 from django.db.models import Count
 
-from .models import Order
+from .models import (
+    Order,
+    Receiver
+)
 from .forms import OrderListChangeForm
 from gifty.admin import BaseModelAdmin
 
@@ -12,8 +15,29 @@ class EditableCheckIgnore(admin.checks.ModelAdminChecks):
         return []
 
 
+class ReceiverInline(admin.StackedInline):
+    model = Receiver
+    verbose_name = '수신자'
+    verbose_name_plural = '수신자'
+    fields = (
+        'name',
+        'phone',
+        'product',
+        'shipment_status',
+        'uuid',
+        'sms_response'
+    )
+    readonly_fields = (
+        'uuid',
+        'sms_response'
+    )
+    extra = 1
+    max_num = 1
+
+
 class OrderAdmin(BaseModelAdmin):
     model = Order
+    inlines = (ReceiverInline, )
     list_display = (
         'id',
         'display_genders',
