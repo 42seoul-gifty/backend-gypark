@@ -347,7 +347,7 @@ class GenderListViewTest(TestCase):
             'data': [
                 {
                     'id': int,
-                    'name': str
+                    'value': str
                 }
             ]
         }
