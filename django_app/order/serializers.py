@@ -125,7 +125,7 @@ class ReceiverSerializer(ModelSerializer):
     def get_product(self, obj):
         if not obj.product:
             return None
-        return ProductSerializer(obj.product).data
+        return ProductSerializer(obj.product, context=self.context).data
 
 
 class OrderCreateSerializer(ModelSerializer):
@@ -185,7 +185,7 @@ class OrderSerializer(ModelSerializer):
 
     # 현 기능에서 수신자는 한명만
     def get_receiver(self, obj):
-        return ReceiverSerializer(obj.receivers.first()).data
+        return ReceiverSerializer(obj.receivers.first(), context=self.context).data
 
     def get_preference(self, obj):
         return {
