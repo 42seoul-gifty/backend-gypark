@@ -74,12 +74,17 @@ class AgeSerializer(ModelSerializer):
 
 
 class GenderSerializer(ModelSerializer):
+    value = SerializerMethodField()
+
     class Meta:
         model = GenderCategory
         fields = (
             'id',
-            'name'
+            'value'
         )
+
+    def get_value(self, obj):
+        return obj.name
 
 
 class PriceSerializer(ModelSerializer):
