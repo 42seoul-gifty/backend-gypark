@@ -3,7 +3,7 @@ from .base import *
 
 DEPLOY_SECRET = json.loads(SECRET_DEPLOY_FILE.read_text())
 
-DEBUG = False
+DEBUG = DEPLOY_SECRET['debug']
 
 ALLOWED_HOSTS = DEPLOY_SECRET['allowed_hosts']
 
