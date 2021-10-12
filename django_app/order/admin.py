@@ -77,7 +77,7 @@ class OrderAdmin(BaseModelAdmin):
 
     @admin.display(description='상세주소')
     def address_detail(self, order):
-        return order.receiver.address.detail
+        return order.receiver.address.address_detail
 
     @admin.display(description='선택상품')
     def selected_product(self, order):
