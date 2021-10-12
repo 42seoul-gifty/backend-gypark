@@ -13,7 +13,8 @@ from ..models import (
     AgeCategory,
     GenderCategory,
     PriceCategory,
-    ProductCategory
+    ProductCategory,
+    ProductImage
 )
 
 
@@ -23,6 +24,12 @@ MEDIA_ROOT = tempfile.mkdtemp()
 def get_test_image_file():
     file = tempfile.NamedTemporaryFile(suffix='.png')
     return ImageFile(file, name='test.png')
+
+
+def get_dummy_product_image(**kwargs):
+    kwargs.setdefault('product_id', 1)
+    kwargs.setdefault('image', get_test_image_file())
+    ProductImage.objects.create(**kwargs)
 
 
 def get_dummy_product(**kwargs):
@@ -44,6 +51,7 @@ def get_dummy_product(**kwargs):
 
     product.gender.add(*gender_ids)
     product.age.add(*age_ids)
+    get_dummy_product_image(product_id=product.id)
 
     return product
 
