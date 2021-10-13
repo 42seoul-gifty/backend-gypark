@@ -194,5 +194,6 @@ SMS_PHONE_NUMBER = COMMON_SECRET['sms_phone_number']
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_HEADERS = [
-    'authorization-code'
+    'authorization-code',
+    'authorization',
 ]
