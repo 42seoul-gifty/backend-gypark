@@ -57,7 +57,8 @@ class TokenRefreshView(get_refresh_view()):
 
 class LogoutView(LogoutView):
     def post(self, request, *args, **kwargs):
-        request.data._mutable = True
+        if hasattr(request.data, '_mutable'):
+            request.data._mutable = True
         request.data['refresh'] = request.data.get('refresh_token')
         return self.logout(request)
 
