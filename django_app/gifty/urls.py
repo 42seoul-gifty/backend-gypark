@@ -1,4 +1,5 @@
 from django.urls import path
+from django.conf.urls import url
 
 from .views import (
     ProductDetailView,
@@ -17,7 +18,8 @@ urlpatterns = [
 
     path('ages', AgeListView.as_view(), name='age_list'),
     path('genders', GenderListView.as_view(), name='gender_list'),
-    path('prices', PriceListView.as_view(), name='price_list'),
+    # url(r'^(?P<version>(v1.0|v1.1))/prices', PriceListView.as_view(), name='price_list'),
+    path('<str:version>/prices', PriceListView.as_view(), name='price_list'),
 
     path('test_500', test_500_view, name='test_500'),
 ]

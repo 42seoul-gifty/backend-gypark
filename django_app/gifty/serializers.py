@@ -94,3 +94,16 @@ class PriceSerializer(ModelSerializer):
             'id',
             'value',
         )
+
+class PriceSerializerVersion1_1(ModelSerializer):
+    index = SerializerMethodField()
+
+    class Meta:
+        model = PriceCategory
+        fields = (
+            'index',
+            'value',
+        )
+
+    def get_index(self, obj):
+        return obj.id

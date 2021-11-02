@@ -3,6 +3,7 @@ from rest_framework.generics import (
     ListAPIView,
 )
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.versioning import URLPathVersioning
 
 from .models import (
     GenderCategory,
@@ -11,6 +12,7 @@ from .models import (
     PriceCategory,
 )
 from .serializers import (
+    PriceSerializerVersion1_1,
     ProductSerializer,
     AgeSerializer,
     GenderSerializer,
@@ -48,5 +50,14 @@ class GenderListView(ListAPIView):
 
 class PriceListView(ListAPIView):
     permission_classes = (IsAuthenticated, )
-    serializer_class = PriceSerializer
     queryset = PriceCategory.objects.actived()
+
+    class versioning_class(URLPathVersioning):
+        allowed_versions = ('v1.0', 'v1.1')
+
+    def get_serializer_class(self):
+        serializers = {
+            'v1.0': PriceSerializer,
+            'v1.1': PriceSerializerVersion1_1,
+        }
+        return serializers[self.request.version]
